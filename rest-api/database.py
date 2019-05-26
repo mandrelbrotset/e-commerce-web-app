@@ -25,12 +25,14 @@ class Database(object):
             self.cursor.execute(query)
             self.connection.commit()
             self.connection.close()
+            return True
         else:
             print("Connect to Database first!")
+            return False
 
     def validate_user(self, username):
         if self.connect():
-            query = "SELECT password, hash_salt FROM Login WHERE username={}".format(username)
+            query = "SELECT password, hash_salt FROM Login WHERE username='{}'".format(username)
             self.cursor.execute(query)
             result = self.cursor.fetchone()
             return result
@@ -38,14 +40,19 @@ class Database(object):
             print("Connect to Database first!")
             return None
 
-    def users(self):
+    def check_user(self, username):
         if self.connect():
-            query = "SELECT * FROM Login"
+            query = "SELECT * FROM Login WHERE username='{}'".format(username)
             self.cursor.execute(query)
-            result = self.cursor.fetchall()
+            result = self.cursor.fetchone()
             self.connection.close()
 
-            return result
+            # username is available
+            if result == None:
+                return True
+            # username is taken(not available)
+            else:
+                return False
         else:
             print("Connect to Database first!")
             return None
