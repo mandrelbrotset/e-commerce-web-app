@@ -4,7 +4,7 @@
         
     </head>
     <body>
-        <h2>Sign up</h2>
+        <h2>Admin sign up</h2>
         <form method="POST">
             <p>First name</p>
             <input type="text" name="first_name">
@@ -15,12 +15,12 @@
             <p>Password <small>(Must be 8 or more)</small></p>
             <input type="password" name="password">
             <br><br>
-            <input type="submit" value="Sign up">
+            <input type="submit" value="Sign up as Admin">
             <br><br>
             {% if error %}
                 <h3>{{ error }}</h3>
             {% endif %}
         </form>
-        <p>Have an account, <a href="/login">login</a> instead</p>
+        <p>Have an account, <a href="/admin">login</a> instead</p>
     </body>
 </html>

@@ -8,6 +8,7 @@ class Database(object):
         self.db_name = config.db_name
         self.db_password = config.db_password        
         self.connection = None
+        
 
     def connect(self):
         try:
@@ -18,10 +19,11 @@ class Database(object):
             print("Couldn't connect to database")
             return False
             
-    def add_user(self, email, username, passw_hash, hash_salt):
+
+    def add_user(self, email, f_name, l_name, passw_hash, hash_salt):
         if self.connect():
-            query = """INSERT IGNORE INTO Login(email, username, password, hash_salt) VALUES
-                        ('{}', '{}', '{}', '{}')""".format(email, username, passw_hash, hash_salt)
+            query = """INSERT IGNORE INTO Login(email, first_name, last_name, password, hash_salt) VALUES
+                        ('{}', '{}', '{}', '{}', '{}')""".format(email, f_name, l_name, passw_hash, hash_salt)
             self.cursor.execute(query)
             self.connection.commit()
             self.connection.close()
@@ -30,9 +32,11 @@ class Database(object):
             print("Connect to Database first!")
             return False
 
-    def validate_user(self, username):
+
+    def validate_user(self, email):
         if self.connect():
-            query = "SELECT password, hash_salt FROM Login WHERE username='{}'".format(username)
+            query = """SELECT password, hash_salt, first_name, last_name FROM Login 
+                        WHERE email='{}'""".format(email)
             self.cursor.execute(query)
             result = self.cursor.fetchone()
             return result
@@ -40,14 +44,27 @@ class Database(object):
             print("Connect to Database first!")
             return None
 
-    def check_user(self, username):
+
+    def validate_admin(self, email):
         if self.connect():
-            query = "SELECT * FROM Login WHERE username='{}'".format(username)
+            query = """SELECT password, hash_salt, first_name, last_name FROM Admin 
+                        WHERE email='{}'""".format(email)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            return result
+        else:
+            print("Connect to Database first!")
+            return None
+
+
+    def check_user(self, email):
+        if self.connect():
+            query = "SELECT * FROM Login WHERE email='{}'".format(email)
             self.cursor.execute(query)
             result = self.cursor.fetchone()
             self.connection.close()
 
-            # username is available
+            # email is available
             if result == None:
                 return True
             # username is taken(not available)
@@ -56,3 +73,34 @@ class Database(object):
         else:
             print("Connect to Database first!")
             return None
+
+
+    def check_admin(self, email):
+        if self.connect():
+            query = "SELECT * FROM Admin WHERE email='{}'".format(email)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            self.connection.close()
+
+            # email is available
+            if result == None:
+                return True
+            # username is taken(not available)
+            else:
+                return False
+        else:
+            print("Connect to Database first!")
+            return None
+
+
+    def add_item(self, name, quantity, tags, description, price, image_url):
+        if self.connect():
+            query = """INSERT IGNORE INTO Item(name, quantity, tags, description, price, image_url) VALUES
+                        ('{}', {}, '{}', '{}', {}, '{}')""".format(name, quantity, tags, description, price, image_url)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        else:
+            print("Connect to Database first!")
+            return False

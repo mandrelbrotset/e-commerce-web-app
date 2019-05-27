@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_hashing import Hashing
 import random
+import json
 from database import Database
 
 app = Flask(__name__)
@@ -13,70 +14,185 @@ API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
 ERR_1 = "API Key Required"
 ERR_2 = "Username not available"
 ERR_3 = "Failed to create account"
+ERR_4 = "Unable to add item"
+
 
 @app.route('/signup', methods=["POST"])
-def signup():
+def user_signup():
     if request.method == "POST":
         if "key" in request.form:
             key = request.form["key"]
 
             if key == API_KEY:
-                username = request.form["username"]
+                # get data from the request
+                f_name = request.form["first_name"]
+                l_name = request.form["last_name"]
+                email = request.form["email"]
+                password = request.form["password"]
+                
+                # capitalize first letter of names
+                f_name = f_name.title()
+                l_name = l_name.title()
+                # convert email to lower case
+                email = email.lower()
+
+                # generate hash for the password
+                salt, hash = generate_hash(password)
+
+                # check if username is available
+                if db.check_user(email):
+                    if db.add_user(email, f_name, l_name, hash, salt): 
+                        return json.dumps({"result" : "success"})
+                    else:
+                        return json.dumps({"result" : ERR_3})
+                else:
+                    return json.dumps({"result" : ERR_2})
+            else:
+                # change to 403 error later
+                return json.dumps({"result" : ERR_1})
+        else:
+            # change to 403 error later
+            return json.dumps({"result" : ERR_1})
+
+
+@app.route('/admin_signup', methods=["POST"])
+def admin_signup():
+    if request.method == "POST":
+        if "key" in request.form:
+            key = request.form["key"]
+
+            if key == API_KEY:
+                # get data from the request
+                f_name = request.form["first_name"]
+                l_name = request.form["last_name"]
+                email = request.form["email"]
+                password = request.form["password"]
+                
+                # capitalize first letter of names
+                f_name = f_name.title()
+                l_name = l_name.title()
+                # convert email to lower case
+                email = email.lower()
+
+                # generate hash for the password
+                salt, hash = generate_hash(password)
+
+                # check if username is available
+                if db.check_admin(email):
+                    if db.add_user(email, f_name, l_name, hash, salt): 
+                        return json.dumps({"result" : "success"})
+                    else:
+                        return json.dumps({"result" : ERR_3})
+                else:
+                    return json.dumps({"result" : ERR_2})
+
+            else:
+                # change to 403 error later
+                return json.dumps({"result" : ERR_1})
+        else:
+            # change to 403 error later
+            return json.dumps({"result" : ERR_1})
+    
+
+@app.route('/login', methods=["POST"])
+def user_login():
+    if request.method == "POST":
+        if "key" in request.form:
+            key = request.form["key"]
+
+            if key == API_KEY:
+                # get data from the request
                 email = request.form["email"]
                 password = request.form["password"]
 
-                print(username, email, password)
-                salt, hash = generate_salt(password)
+                # convert inputted email to lower case
+                email = email.lower()
 
-                # check if username is available
-                if db.check_user(username):
-                    if db.add_user(email, username, hash, salt):
-                        return "success"
+                result = db.validate_user(email)
+
+                if result:
+                    stored_hash = result[0]
+                    stored_salt = result[1]
+                    f_name = result[2]
+                    l_name = result[3]
+
+                    if hashing.check_value(stored_hash, password, salt=stored_salt):
+                        ret = {"result" : "success",
+                               "first_name": f_name,
+                               "last_name": l_name}
+                        return json.dumps(ret)
                     else:
-                        return ERR_3
+                        return json.dumps({"result" : "Login error"})
                 else:
-                    return ERR_2
+                    return json.dumps({"result" : "Login error"})
             else:
                 # change to 403 error later
-                return ERR_1
+                return json.dumps({"result" : ERR_1})
         else:
             # change to 403 error later
-            return ERR_1
-    
-@app.route('/login', methods=["POST"])    
-def login():
+            return json.dumps({"result" : ERR_1})
+
+
+
+@app.route('/admin_login', methods=["POST"])
+def admin_login():
     if request.method == "POST":
         if "key" in request.form:
             key = request.form["key"]
 
             if key == API_KEY:
-                username = request.form["username"]
+                # get data from the request
+                email = request.form["email"]
                 password = request.form["password"]
 
-                print(username, password)
-                result = db.validate_user(username)
+                # convert inputted email to lower case
+                email = email.lower()
 
-                print(result)
+                result = db.validate_admin(email)
+
                 if result:
                     stored_hash = result[0]
                     stored_salt = result[1]
-
-                    hash = hashing.hash_value(password, salt=stored_salt)
-                    print(hash)
+                    f_name = result[2]
+                    l_name = result[3]
 
                     if hashing.check_value(stored_hash, password, salt=stored_salt):
-                        return "success"
+                        ret = json.dumps({"result" : "success",
+                                          "first_name": f_name,
+                                          "last_name": l_name})
+                        return ret
                 else:
-                    return "Login error"
+                    return json.dumps({"result" : "Login error"})
             else:
                 # change to 403 error later
-                return ERR_1
+                return json.dumps({"result" : ERR_1})
         else:
             # change to 403 error later
-            return ERR_1
+            return json.dumps({"result" : ERR_1})
 
 
-def generate_salt(password):
+@app.route('/add_product', methods=["POST"])
+def add_product():
+    if request.method == "POST":
+        if "key" in request.form:
+            key = request.form["key"]
+
+            if key == API_KEY:
+                # get data from the request
+                name = request.form["name"]
+                quantity = request.form["quantity"]
+                tags = request.form["tags"]
+                description = request.form["description"]
+                price = request.form["price"]
+                image_url = request.form["image_url"]
+
+                if db.add_item(name, quantity, tags, description, price, image_url):
+                    return json.dumps({"result" : "success"})
+                else:
+                    return json.dumps({"result" : ERR_4})
+
+
+def generate_hash(password):
     passw_salt_len = 20
     length = len(password)
     salt_length = passw_salt_len - length
@@ -86,12 +202,9 @@ def generate_salt(password):
         r = random.randint(97, 122)
         salt = salt + str(chr(r))
 
-    print(salt)
     hash = hashing.hash_value(password, salt=salt)
-    print(hash)
 
     return salt, hash
-
 
 
 if __name__ == "__main__":

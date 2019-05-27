@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>Administrator Page</h1>
+        <h2>Welcome back {{data['first_name']}}</h2>
+
+        <form method="POST">
+            <p>Item name</p>
+            <input type="text" name="name">
+            <p>Price</p>
+            <input type="number" name="price">
+            <p>Quantity</p>
+            <input type="number" name="quantity">
+            <p>Description</p>
+            <input type="text" name="description">
+            <p>Tags (enter multiple tags separated by comma)</p>
+            <input type="text" name="tags">
+            <br><br>
+            <input type="file" name="image">
+            <br><br>
+            <input type="submit" value="Add to stock">
+        </form>
+
+        <p><a href="/admin_logout">Log out</a></p>
+    </body>
+</html>
