@@ -28,9 +28,8 @@ class Database(object):
             self.connection.commit()
             self.connection.close()
             return True
-        else:
-            print("Connect to Database first!")
-            return False
+        
+        return False
 
 
     def validate_user(self, email):
@@ -40,23 +39,10 @@ class Database(object):
             self.cursor.execute(query)
             result = self.cursor.fetchone()
             return result
-        else:
-            print("Connect to Database first!")
-            return None
+        
+        return None
 
-
-    def validate_admin(self, email):
-        if self.connect():
-            query = """SELECT password, hash_salt, first_name, last_name FROM Admin 
-                        WHERE email='{}'""".format(email)
-            self.cursor.execute(query)
-            result = self.cursor.fetchone()
-            return result
-        else:
-            print("Connect to Database first!")
-            return None
-
-
+    
     def check_user(self, email):
         if self.connect():
             query = "SELECT * FROM Login WHERE email='{}'".format(email)
@@ -70,9 +56,30 @@ class Database(object):
             # username is taken(not available)
             else:
                 return False
-        else:
-            print("Connect to Database first!")
-            return None
+        
+        return None
+
+    
+    def add_admin(self, email, f_name, l_name, passw_hash, hash_salt):
+        if self.connect():
+            query = """INSERT IGNORE INTO Admin(email, first_name, last_name, password, hash_salt) VALUES
+                        ('{}', '{}', '{}', '{}', '{}')""".format(email, f_name, l_name, passw_hash, hash_salt)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        
+        return False
+
+
+    def validate_admin(self, email):
+        if self.connect():
+            query = """SELECT password, hash_salt, first_name, last_name FROM Admin 
+                        WHERE email='{}'""".format(email)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            return result
+        return None
 
 
     def check_admin(self, email):
@@ -88,9 +95,8 @@ class Database(object):
             # username is taken(not available)
             else:
                 return False
-        else:
-            print("Connect to Database first!")
-            return None
+        
+        return None
 
 
     def add_item(self, name, quantity, tags, description, price, image_url):
@@ -101,6 +107,19 @@ class Database(object):
             self.connection.commit()
             self.connection.close()
             return True
-        else:
-            print("Connect to Database first!")
-            return False
+
+        return False
+
+
+    def get_items(self):
+        if self.connect():
+            query = "SELECT * FROM Item"
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            self.connection.close()
+
+            # return all Items
+            if result:
+                return result
+        
+        return None

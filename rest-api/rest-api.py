@@ -15,6 +15,7 @@ ERR_1 = "API Key Required"
 ERR_2 = "Username not available"
 ERR_3 = "Failed to create account"
 ERR_4 = "Unable to add item"
+ERR_5 = "Invalid method"
 
 
 @app.route('/signup', methods=["POST"])
@@ -54,6 +55,8 @@ def user_signup():
             # change to 403 error later
             return json.dumps({"result" : ERR_1})
 
+    return json.dumps({"result" : ERR_5})
+
 
 @app.route('/admin_signup', methods=["POST"])
 def admin_signup():
@@ -79,7 +82,7 @@ def admin_signup():
 
                 # check if username is available
                 if db.check_admin(email):
-                    if db.add_user(email, f_name, l_name, hash, salt): 
+                    if db.add_admin(email, f_name, l_name, hash, salt): 
                         return json.dumps({"result" : "success"})
                     else:
                         return json.dumps({"result" : ERR_3})
@@ -92,7 +95,8 @@ def admin_signup():
         else:
             # change to 403 error later
             return json.dumps({"result" : ERR_1})
-    
+
+    return json.dumps({"result" : ERR_5})
 
 @app.route('/login', methods=["POST"])
 def user_login():
@@ -132,7 +136,7 @@ def user_login():
             # change to 403 error later
             return json.dumps({"result" : ERR_1})
 
-
+    return json.dumps({"result" : ERR_5})
 
 @app.route('/admin_login', methods=["POST"])
 def admin_login():
@@ -170,6 +174,7 @@ def admin_login():
             # change to 403 error later
             return json.dumps({"result" : ERR_1})
 
+    return json.dumps({"result" : ERR_5})
 
 @app.route('/add_product', methods=["POST"])
 def add_product():
@@ -191,6 +196,28 @@ def add_product():
                 else:
                     return json.dumps({"result" : ERR_4})
 
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/get_products', methods=["POST"])
+def get_products():
+    if request.method == "POST":
+        if "key" in request.form:
+            key = request.form["key"]
+
+            if key == API_KEY:
+                items = db.get_items()
+                products = []
+
+                for item in items:
+                    products.append([item[1], item[2], item[3], item[4], float(item[5]), item[6]])
+
+                print(products)
+                ret = {"result" : "success",
+                       "items" : products}
+                return json.dumps(ret)
+
+    return json.dumps({"result" : ERR_5})
 
 def generate_hash(password):
     passw_salt_len = 20

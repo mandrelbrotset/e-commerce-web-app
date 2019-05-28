@@ -1,18 +1,21 @@
-from flask import Flask, request, render_template, flash, session, redirect, url_for
+from flask import Flask, request, render_template, flash, session, redirect, \
+    url_for, send_from_directory
 import requests as re
 from werkzeug.utils import secure_filename
 import json
 import os
 
-app = Flask(__name__)
-app.secret_key = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
 
-
-# Rest API 
+# Rest API endpoint
 API_ENDPOINT = "http://127.0.0.1:5002/"
 API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
-UPLOAD_FOLDER = "images"
+UPLOAD_FOLDER = "static/images"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'svg'])
+
+
+app = Flask(__name__, static_folder='static')
+app.secret_key = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route('/')
@@ -119,10 +122,12 @@ def login():
 
 @app.route('/dashboard')
 def dashboard():
-    if session['logged_in'] and len(session['email']) > 0:
-        data = [session['email'], session['first_name']]
-        return render_template('dashboard.html', data=data)
-    return "Login in first!"
+    if 'logged_in' in session:
+        if session['logged_in'] and len(session['email']) > 0:
+            data = [session['email'], session['first_name']]
+            return render_template('dashboard.html', data=data)
+
+    return redirect(url_for("login"))
 
 
 @app.route('/logout')
@@ -191,11 +196,9 @@ def admin_login():
         # Rest API endpoint
         endpoint = API_ENDPOINT + "admin_login"
 
-        params = {"email": email,
-                  "password": password}
-
-        # store API key in post request data
-        params["key"] = API_KEY
+        params = {"email" : email,
+                  "password" : password,
+                  "key" : API_KEY}
         # make a POST request to the Rest API
         response = re.post(url=endpoint, data=params)
         # convert result from JSON to python dictionary
@@ -245,18 +248,17 @@ def admin_dashboard():
                 
                 if 'image' not in request.files:
                     data['msg'] = "Upload an image"
-                    return redirect(request.url)
+
                 image = request.files['image']
                 
                 if image.filename == "":
                     data['msg'] = "No selected file"
-                    return redirect(request.url)
 
                 image_url = ""
                 if image and allowed_file(image.filename):
                     filename = secure_filename(image.filename)
                     image_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    image.save(image_url)
+                    image.save(filename)
 
                 params = {"name" : name,
                         "quantity" : quantity,
@@ -265,6 +267,8 @@ def admin_dashboard():
                         "price" : price,
                         "image_url" : image_url,
                         "key" : API_KEY}
+
+                print(params)
 
                 endpoint = API_ENDPOINT + "add_product"
                 response = re.post(url=endpoint, data=params)
@@ -282,6 +286,32 @@ def admin_dashboard():
 def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('admin_login'))
+
+
+@app.route('/get_products', methods=["GET"])
+def get_products():
+    params = {"key" : API_KEY}
+    endpoint = API_ENDPOINT + "get_products"
+    response = re.post(url=endpoint, data=params)
+    response = json.loads(response.text)
+
+    if response['result'] == "success":
+        products = response['items']
+        return json.dumps(products)
+
+    return ""
+
+
+@app.route('/images/<path:path>')
+def serve_image(path):
+    if allowed_file(path):
+        return send_from_directory('static/images', path)
+
+
+@app.route('/js/<path:path>')
+def serve_js(path):
+    if path[-2:] == "js":
+        return send_from_directory('static/js', path)
 
 
 # helper functions
