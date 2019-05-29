@@ -22,7 +22,7 @@ class Database(object):
 
     def add_user(self, email, f_name, l_name, passw_hash, hash_salt):
         if self.connect():
-            query = """INSERT IGNORE INTO Login(email, first_name, last_name, password, hash_salt) VALUES
+            query = """INSERT INTO Login(email, first_name, last_name, password, hash_salt) VALUES
                         ('{}', '{}', '{}', '{}', '{}')""".format(email, f_name, l_name, passw_hash, hash_salt)
             self.cursor.execute(query)
             self.connection.commit()
@@ -62,7 +62,7 @@ class Database(object):
     
     def add_admin(self, email, f_name, l_name, passw_hash, hash_salt):
         if self.connect():
-            query = """INSERT IGNORE INTO Admin(email, first_name, last_name, password, hash_salt) VALUES
+            query = """INSERT INTO Admin(email, first_name, last_name, password, hash_salt) VALUES
                         ('{}', '{}', '{}', '{}', '{}')""".format(email, f_name, l_name, passw_hash, hash_salt)
             self.cursor.execute(query)
             self.connection.commit()
@@ -123,3 +123,45 @@ class Database(object):
                 return result
         
         return None
+
+
+    def item_by_id(self, item_id):
+        if self.connect():
+            query = "SELECT * FROM Item WHERE id={}".format(item_id)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            self.connection.close()
+
+            # return all Items
+            if result:
+                return result
+        
+        return None
+
+
+
+    def item_quantity(self, item_id):
+        if self.connect():
+            query = "SELECT quantity FROM Item WHERE id='{}'".format(item_id)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            self.connection.close()
+
+            if result:
+                return result[0]
+            else:
+                return 0
+        
+        return None
+
+
+    def add_to_cart(self, email, item_id, quantity, price_per_item):
+        if self.connect():
+            query = """INSERT INTO Cart(email, item_id, quantity, price_per_item) 
+                       VALUES('{}', {}, {}, {})""".format(email, item_id, quantity, price_per_item)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+
+        return False

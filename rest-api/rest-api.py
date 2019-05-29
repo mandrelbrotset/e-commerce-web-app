@@ -176,8 +176,8 @@ def admin_login():
 
     return json.dumps({"result" : ERR_5})
 
-@app.route('/add_product', methods=["POST"])
-def add_product():
+@app.route('/add_item', methods=["POST"])
+def add_item():
     if request.method == "POST":
         if "key" in request.form:
             key = request.form["key"]
@@ -199,8 +199,8 @@ def add_product():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/get_products', methods=["POST"])
-def get_products():
+@app.route('/get_items', methods=["POST"])
+def get_items():
     if request.method == "POST":
         if "key" in request.form:
             key = request.form["key"]
@@ -210,14 +210,58 @@ def get_products():
                 products = []
 
                 for item in items:
-                    products.append([item[1], item[2], item[3], item[4], float(item[5]), item[6]])
+                    products.append([item[0], item[1], item[2], item[3],\
+                     item[4], float(item[5]), item[6]])
 
-                print(products)
                 ret = {"result" : "success",
                        "items" : products}
                 return json.dumps(ret)
 
     return json.dumps({"result" : ERR_5})
+
+
+@app.route('/item_by_id', methods=["POST"])
+def item_by_id():
+    if request.method == "POST":
+        item_id = request.form["item_id"]
+
+        item = db.item_by_id(item_id)
+        product = [item[0], item[1], item[2], item[3], item[4], float(item[5]), item[6]]
+
+        ret = {"result" : "success",
+               "item"   : product}
+
+        return json.dumps(ret)
+
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/add_to_cart', methods=["POST"])
+def add_to_cart():
+    if request.method == "POST":
+        if "key" in request.form:
+            key = request.form["key"]
+
+            if key == API_KEY:
+                email = request.form["email"]
+                quantity = int(request.form["quantity"])
+                item_id = request.form["item_id"]
+                price_per_item = request.form["price_per_item"]
+
+                # if the user has the item in stock already, yes increase quantity
+                
+
+                # check if there is enough qunatity in stock
+                if quantity < 1:
+                    return json.dumps({"result" : "Quantity must be at least 1"})
+                elif quantity > db.item_quantity(item_id):
+                    return json.dumps({"result" : "Not enough quantity in stock"})
+                else:
+                    db.add_to_cart(email, item_id, quantity, price_per_item)
+                    return json.dumps({"result" : "success"})
+                            
+    return json.dumps({"result" : ERR_5})
+
 
 def generate_hash(password):
     passw_salt_len = 20
