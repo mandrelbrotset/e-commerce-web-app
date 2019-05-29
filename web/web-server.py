@@ -268,9 +268,7 @@ def admin_dashboard():
                         "image_url" : image_url,
                         "key" : API_KEY}
 
-                print(params)
-
-                endpoint = API_ENDPOINT + "add_product"
+                endpoint = API_ENDPOINT + "add_item"
                 response = re.post(url=endpoint, data=params)
                 response = json.loads(response.text)
 
@@ -291,7 +289,7 @@ def admin_logout():
 @app.route('/get_products', methods=["GET"])
 def get_products():
     params = {"key" : API_KEY}
-    endpoint = API_ENDPOINT + "get_products"
+    endpoint = API_ENDPOINT + "get_items"
     response = re.post(url=endpoint, data=params)
     response = json.loads(response.text)
 
@@ -300,6 +298,53 @@ def get_products():
         return json.dumps(products)
 
     return ""
+
+
+@app.route('/item/<int:id>', methods=["GET", "POST"])
+def show_item(id):
+    data = {'msg' : None,
+            'item': None}
+
+    if request.method == "POST":
+        item_id = request.form["item_id"]
+        price_per_item = request.form["price"]
+        quantity = request.form["quantity"]
+
+        if 'email' in session:
+            email = session['email']
+            
+            params = {"email" : email,
+                      "quantity" : quantity,
+                      "price_per_item" : price_per_item,
+                      "item_id" : item_id,
+                      "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "add_to_cart"
+            response = re.post(url=endpoint, data=params)
+            response = json.loads(response.text)
+
+            if response["result"] == "success":
+                data['msg'] = "Item added to cart"
+            else:
+                data['msg'] = "Error adding item to cart"
+
+            return redirect(url_for("/item/" + item_id))
+        else:
+            data['msg'] = "Sign in first"
+
+
+    params = {"item_id" : id,
+              "key" : API_KEY}
+
+    endpoint = API_ENDPOINT + "item_by_id"
+    response = re.post(url=endpoint, data=params)
+    response = json.loads(response.text)
+
+    if response['result'] == "success":
+        data['item'] = response['item']
+        return render_template('item.html', data=data)
+
+    return "<html>Item not found</html>"
 
 
 @app.route('/images/<path:path>')
