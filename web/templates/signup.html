@@ -1,37 +1,47 @@
 {% extends "base.html" %}
 {% block content %}
-
-    <div class="signup-form">
+ 
+    <div class="form">
+        <h2>Create account</h2>
         <form method="POST">
-            <h2>Sign up</h2>
-            <div class="input-group">
+            <div class="input-group ig">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="">First and last name</span>
+                    <span class="input-group-text" id="">First name</span>
                 </div>
-                <input type="text" name="first_name">
-                <input type="text" name="last_name">
+                <input type="text" name="first_name" style="width:250px;">
             </div>
-            <div class="input-group">
+
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Last name</span>
+                </div>
+                <input type="text" name="last_name" style="width:252px;">
+            </div>
+
+            <div class="input-group ig">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="">Email</span>
                 </div>
-                <input type="text" name="email">
-            </div>
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Password 
-                        <small>(Must be 8 or more)</small>
-                    </span>
-                </div>
-                <input type="password" name="password">
+                <input type="text" name="email" style="width:286px;">
             </div>
 
-            <input type="submit" value="Sign up" class="btn">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Password</span>
+                </div>
+                <input type="password" name="password" style="width:258px;" 
+                    placeholder="At least 8 characters. ">
+            </div>
+            <small>Passwords must be at least 8 characters.</small>
+            <br>
+            <input type="submit" value="Sign up" class="btn btn-primary form-btn">
             <br><br>
             {% if error %}
+                {% for err in error %}
                 <div class="alert alert-danger" role="alert">
-                    {{ error }}
+                    {{ err }}
                 </div>
+                {% endfor %}
             {% endif %}
     
         </form>

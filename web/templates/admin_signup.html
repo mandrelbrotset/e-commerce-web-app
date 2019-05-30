@@ -1,26 +1,50 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        
-    </head>
-    <body>
-        <h2>Admin sign up</h2>
+{% extends "base.html" %}
+{% block content %}
+ 
+    <div class="form">
+        <h2>Create admin account</h2>
         <form method="POST">
-            <p>First name</p>
-            <input type="text" name="first_name">
-            <p>Last name</p>
-            <input type="text" name="last_name">
-            <p>Email</p>
-            <input type="text" name="email">
-            <p>Password <small>(Must be 8 or more)</small></p>
-            <input type="password" name="password">
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">First name</span>
+                </div>
+                <input type="text" name="first_name" style="width:250px;">
+            </div>
+
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Last name</span>
+                </div>
+                <input type="text" name="last_name" style="width:252px;">
+            </div>
+
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Email</span>
+                </div>
+                <input type="text" name="email" style="width:286px;">
+            </div>
+
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Password</span>
+                </div>
+                <input type="password" name="password" style="width:258px;" 
+                    placeholder="At least 8 characters. ">
+            </div>
+            <small>Passwords must be at least 8 characters.</small>
+            <br>
+            <input type="submit" value="Create admin account" class="btn btn-primary form-btn">
             <br><br>
-            <input type="submit" value="Sign up as Admin">
-            <br><br>
+    
             {% if error %}
-                <h3>{{ error }}</h3>
+                {% for err in error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ err }}
+                </div>
+                {% endfor %}
             {% endif %}
         </form>
         <p>Have an account, <a href="/admin">login</a> instead</p>
-    </body>
-</html>
+ 
+{% endblock %}

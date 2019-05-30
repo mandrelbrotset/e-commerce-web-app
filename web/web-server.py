@@ -63,20 +63,22 @@ def user_signup():
                 # save first name in  session storage with first letter capitalized
                 session['first_name'] = f_name.title()
                 # redirect to dashboard
-                print("redirecting")
-                return redirect(url_for("dashboard"))
+                session.pop('admin_logged_in', None)
+
+                return redirect(url_for("home"))
             else:
-                error = response['result']
+                error = [response['result']]
 
         else:
+            error = []
             if len(f_name) <= 0:
-                error = "You must enter a first name"
+                error.append("You must enter a first name")
             if len(l_name) <= 0:
-                error = "You must enter a last name"
+                error.append("You must enter a last name")
             if len(email) <= 0:
-                error = "You must enter an email"
+                error.append("You must enter an email")
             if len(password) < 8:
-                error = "Password must length requirements"
+                error.append("Password must length requirements")
             
     return render_template("signup.html", error=error)
 
@@ -107,13 +109,14 @@ def login():
             session['email'] = email
             # save first name in  session storage with first letter capitalized
             session['first_name'] = response['first_name'].title()
-    
             session['logged_in'] = True
+
+            session.pop('admin_logged_in', None)
             # redirect to dashboard
             return redirect(url_for("home"))
         
         else:
-            error = "Invalid username or password. Please try again!"
+            error = "Invalid username or password!"
 
     if "logged_in" in session:
         if session['logged_in']:
@@ -162,20 +165,22 @@ def admin_signup():
                 # save first name in  session storage with first letter capitalized
                 session['first_name'] = f_name.title()
                 # redirect to dashboard
+                session.pop('logged_in', None)
 
                 return redirect(url_for("admin_dashboard"))
             else:
                 error = response['result']
 
         else:
+            error = []
             if len(f_name) <= 0:
-                error = "You must enter a first name"
+                error.append("You must enter a first name")
             if len(l_name) <= 0:
-                error = "You must enter a last name"
+                error.append("You must enter a last name")
             if len(email) <= 0:
-                error = "You must enter an email"
+                error.append("You must enter an email")
             if len(password) < 8:
-                error = "Password must length requirements"
+                error.append("Password must length requirements")
             
     return render_template("admin_signup.html", error=error)
 
@@ -259,7 +264,7 @@ def admin_dashboard():
                         "tags" : tags,
                         "description" : description,
                         "price" : price,
-                        "image_url" : image_url,
+                        "image_url" : filename,
                         "key" : API_KEY}
 
                 endpoint = API_ENDPOINT + "add_item"
@@ -278,6 +283,7 @@ def admin_dashboard():
 def admin_signout():
     session.pop('admin_logged_in', None)
     session.pop('email', None)
+    session.pop('first_name', None)
     return redirect(url_for('admin_login'))
 
 

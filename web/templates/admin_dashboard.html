@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-    <head>
+{% extends "base.html" %}
+{% block content %}
 
-    </head>
-    <body>
         <h1>Administrator Page</h1>
         <h2>Welcome back {{data['first_name']}}</h2>
 
@@ -29,16 +26,46 @@
                     <br><br>
                 {% endif %}
             </form>
+        </div>
 
-            <br><br>
+        <style>
+            #loading {
+                display: block;
+                width: 300px;
+                margin-top: 90px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+    
+            .cart-group {
+                width: 80%;
+                margin: 20px auto;
+            }
+    
+            .cart-group img {
+                float: left;
+            }
+            .side-content {
+                float: left;
+                padding-left: 10px;
+                padding-top: 35px;
+            }
+            
+            .side-content p {
+                padding-left: 25px;
+            }
+    
+            .side-content small {
+                padding-left: 25px;
+            }
+        </style>
+        <div>
             <div id="product">
-                <img src="images/loading.gif" style="height:100px;" id="loading">
+                <img src="{{ url_for('static', filename='images/loading.gif') }}" id="loading">
             </div>
-
-            <script type="text/javascript" src="js/load_products.js"></script>
-
+            <script type="text/javascript" src="{{ url_for('static', filename='js/load_products.js') }}"></script>
         </div>
 
         <p><a href="/admin_signout">Sign out</a></p>
-    </body>
-</html>
+    
+{% endblock %}

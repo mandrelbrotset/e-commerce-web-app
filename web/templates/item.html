@@ -1,65 +1,61 @@
 {% extends "base.html" %}
 {% block content %}
     <style>
+        .content {
+            width: 95%;
+            margin-top: 40px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .view-item {
-            width: 90%;
-            margin: 40px auto;
+            width: 100%;
             padding: 5px;
+            display: inline-block;
         }
 
         .view-item img {
             float: left;
-            width: 38%;
+            width: 600px;
         }
 
         .view-item .side-content {
             float: left;
-            width: 60%;
+            margin: 100px 20px;
+            width: 600px;
+        }
+
+        .add-btn {
+            margin-top: 20px;
         }
     </style>
 
     <div>
         {% if data['item'] %}
-        <div class="card view-item">
-            <img src="{{ url_for('static', filename='images/' + data['item'][6]) }}" alt="Item image">
-            <div class="side-content">
-                <h4 class="card-title">{{ data['item'][1] }} ${{ data['item'][5] }}</h4>
-                <p class="card-text">{{ data['item'][4] }}</p>
-                <small>Tags: {{ data['item'][3] }}</small>
-                <form method="POST">
-                    <input name="item_id" value="{{ data['item'][0] }}" type="hidden" />
-                    <input name="price" value="{{ data['item'][5] }}" type="hidden" />
-                    <input name='quantity' value='1' type='number' size='10' step='1' />
-                    <br>
-                    {% if data['msg'] %}
-                        <h2>{{ data['msg'] }}</h2>
+        <div class="content">
+            <div class="card view-item">
+                <div src="img-wrapper">
+                    <img src="{{ url_for('static', filename='images/' + data['item'][6]) }}" alt="Item image">
+                </div>
+                <div class="side-content">
+                    <h4 class="card-title">{{ data['item'][1] }} ${{ data['item'][5] }}</h4>
+                    <p class="card-text">{{ data['item'][4] }}</p>
+                    <small>Tags: {{ data['item'][3] }}</small>
+    
+                    <form method="POST">
+                        <input name="item_id" value="{{ data['item'][0] }}" type="hidden" />
+                        <input name="price" value="{{ data['item'][5] }}" type="hidden" />
+                        <input name='quantity' value='1' type='number' size='10' step='1' />
                         <br>
-                    {% endif %}
-                    <button class="btn btn-primary"  type="submit">Add to cart</button>
-                </form>
+                        {% if data['msg'] %}
+                            <h2>{{ data['msg'] }}</h2>
+                            <br>
+                        {% endif %}
+                        <button class="btn btn-primary add-btn"  type="submit">Add to cart</button>
+                    </form>
+                </div>
             </div>
         </div>
-
-
-        <br><br>
-
-
-        <img src="{{ url_for('static', filename='images/' + data['item'][6]) }}" style="height:120px;" />
-        <h2>{{ data['item'][1] }} ${{ data['item'][5] }}</h2>
-        <p>{{ data['item'][4] }}</p>
-        <small>Tags: {{ data['item'][3] }}</small>
-
-        <form method="POST">
-            <input name="item_id" value="{{ data['item'][0] }}" type="hidden" />
-            <input name="price" value="{{ data['item'][5] }}" type="hidden" />
-            <input name='quantity' value='1' type='number' size='10' step='1' />
-            <br>
-            {% if data['msg'] %}
-                <h2>{{ data['msg'] }}</h2>
-                <br>
-            {% endif %}
-            <input type="submit" value="Add to cart">
-        </form>
         {% endif %}
     </div>
 

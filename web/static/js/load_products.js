@@ -18,7 +18,6 @@ xhr.onerror = function (e) {
 xhr.send(null);
 
 
-
 function showProducts(products) {
     var elem = document.getElementById('loading');
     elem.style.display = 'hidden';
@@ -31,7 +30,7 @@ function showProducts(products) {
         console.log(products[i])
 
         data = data + `<a href="item/` + products[i][0] + `" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <img src="static/images/` + products[i][6] + `" style="height:200px;" />
+                            <img src="static/images/` + products[i][6] + `" style="width:320px;height:250px;" />
                             <div class="side-content">
                                 <div class="d-inline-flex p-3">
                                    <div class="p-2" style="width:700px;"><h4>` + products[i][1] + `</h4></div>
