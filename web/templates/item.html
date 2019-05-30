@@ -1,27 +1,66 @@
-<!DOCTYPE html>
-<html>
-    <head>
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        .view-item {
+            width: 90%;
+            margin: 40px auto;
+            padding: 5px;
+        }
 
-    </head>
-    <body>
-        <div>
-            {% if data['item'] %}
-            <img src="http://localhost:5000/images/{{ data['item'][6] }}" style="height:120px;">
-            <h2>{{ data['item'][1] }} ${{ data['item'][5] }}</h2>
-            <p>{{ data['item'][4] }}</p>
-            <small>Tags: {{ data['item'][3] }}</small>
+        .view-item img {
+            float: left;
+            width: 38%;
+        }
 
-            <form method="POST">
-                <input name="item_id" value="{{ data['item'][0] }}" type="hidden">
-                <input name="price" value="{{ data['item'][5] }}" type="hidden">
-                <br><br>
-                {% if data['msg'] %}
-                    <h2>{{ data['msg'] }}</h2>
-                    <br><br>
-                {% endif %}
-                <input type="submit" value="Add to cart">
-            </form>
-            {% endif %}
+        .view-item .side-content {
+            float: left;
+            width: 60%;
+        }
+    </style>
+
+    <div>
+        {% if data['item'] %}
+        <div class="card view-item">
+            <img src="{{ url_for('static', filename='images/' + data['item'][6]) }}" alt="Item image">
+            <div class="side-content">
+                <h4 class="card-title">{{ data['item'][1] }} ${{ data['item'][5] }}</h4>
+                <p class="card-text">{{ data['item'][4] }}</p>
+                <small>Tags: {{ data['item'][3] }}</small>
+                <form method="POST">
+                    <input name="item_id" value="{{ data['item'][0] }}" type="hidden" />
+                    <input name="price" value="{{ data['item'][5] }}" type="hidden" />
+                    <input name='quantity' value='1' type='number' size='10' step='1' />
+                    <br>
+                    {% if data['msg'] %}
+                        <h2>{{ data['msg'] }}</h2>
+                        <br>
+                    {% endif %}
+                    <button class="btn btn-primary"  type="submit">Add to cart</button>
+                </form>
+            </div>
         </div>
-    </body>
-</html>
+
+
+        <br><br>
+
+
+        <img src="{{ url_for('static', filename='images/' + data['item'][6]) }}" style="height:120px;" />
+        <h2>{{ data['item'][1] }} ${{ data['item'][5] }}</h2>
+        <p>{{ data['item'][4] }}</p>
+        <small>Tags: {{ data['item'][3] }}</small>
+
+        <form method="POST">
+            <input name="item_id" value="{{ data['item'][0] }}" type="hidden" />
+            <input name="price" value="{{ data['item'][5] }}" type="hidden" />
+            <input name='quantity' value='1' type='number' size='10' step='1' />
+            <br>
+            {% if data['msg'] %}
+                <h2>{{ data['msg'] }}</h2>
+                <br>
+            {% endif %}
+            <input type="submit" value="Add to cart">
+        </form>
+        {% endif %}
+    </div>
+
+{% endblock %}

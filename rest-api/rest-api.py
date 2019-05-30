@@ -242,25 +242,62 @@ def add_to_cart():
         if "key" in request.form:
             key = request.form["key"]
 
+            # check for API Key
             if key == API_KEY:
                 email = request.form["email"]
                 quantity = int(request.form["quantity"])
                 item_id = request.form["item_id"]
-                price_per_item = request.form["price_per_item"]
 
-                # if the user has the item in stock already, yes increase quantity
-                
-
-                # check if there is enough qunatity in stock
-                if quantity < 1:
-                    return json.dumps({"result" : "Quantity must be at least 1"})
-                elif quantity > db.item_quantity(item_id):
-                    return json.dumps({"result" : "Not enough quantity in stock"})
-                else:
-                    db.add_to_cart(email, item_id, quantity, price_per_item)
+                # if the user has the item in stock already
+                if db.in_cart(email, item_id) and db.item_quantity(item_id) >= quantity + 1:
+                    # increase the qunatity in the cart
+                    db.increase_quantity(email, item_id)
                     return json.dumps({"result" : "success"})
+                else:
+                    # check if there is enough qunatity in stock
+                    if quantity < 1:
+                        return json.dumps({"result" : "Quantity must be at least 1"})
+                    elif quantity > db.item_quantity(item_id):
+                        return json.dumps({"result" : "Not enough quantity in stock"})
+                    else:
+                        db.add_to_cart(email, item_id, quantity)
+                        return json.dumps({"result" : "success"})
                             
     return json.dumps({"result" : ERR_5})
+
+
+@app.route('/cart', methods=["POST"])
+def cart():
+    if request.method == "POST":
+        if "key" in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+
+                # get item_id, quantity and price of the items in the users cart
+                value = db.get_user_cart(email)
+
+                cart = []
+
+                #
+                if value:
+                    for val in value:
+                        # get more details about the cart item
+                        item = db.item_by_id(val[0])
+                        cart.append({"item_id":val[0], "quantity":val[1], "price":float(item[5]), 
+                                     "name":item[1], "image_url":item[6]})
+
+                    ret = {"result" : "success",
+                           "cart" : cart}
+
+                    return json.dumps(ret)
+                else:
+                    return json.dumps({"result" : "empty"})
+
+    return json.dumps({"result" : ERR_5})
+                
 
 
 def generate_hash(password):

@@ -33,7 +33,6 @@ CREATE TABLE Cart
   email VARCHAR(255) NOT NULL,
   item_id INT NOT NULL,
   quantity INT NOT NULL,
-  price_per_item DECIMAL(15, 2) NOT NULL,
 
   CONSTRAINT FOREIGN KEY (email) 
     REFERENCES Login(email)

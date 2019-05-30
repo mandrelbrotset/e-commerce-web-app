@@ -101,7 +101,7 @@ class Database(object):
 
     def add_item(self, name, quantity, tags, description, price, image_url):
         if self.connect():
-            query = """INSERT IGNORE INTO Item(name, quantity, tags, description, price, image_url) VALUES
+            query = """INSERT INTO Item(name, quantity, tags, description, price, image_url) VALUES
                         ('{}', {}, '{}', '{}', {}, '{}')""".format(name, quantity, tags, description, price, image_url)
             self.cursor.execute(query)
             self.connection.commit()
@@ -155,13 +155,53 @@ class Database(object):
         return None
 
 
-    def add_to_cart(self, email, item_id, quantity, price_per_item):
+    def add_to_cart(self, email, item_id, quantity):
         if self.connect():
-            query = """INSERT INTO Cart(email, item_id, quantity, price_per_item) 
-                       VALUES('{}', {}, {}, {})""".format(email, item_id, quantity, price_per_item)
+            query = """INSERT INTO Cart(email, item_id, quantity) 
+                       VALUES('{}', {}, {})""".format(email, item_id, quantity)
             self.cursor.execute(query)
             self.connection.commit()
             self.connection.close()
             return True
 
+        return False
+
+
+    def in_cart(self, email, item_id):
+        if self.connect():
+            query = "SELECT * FROM Cart WHERE email='{}' AND item_id={}".format(email, item_id)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            self.connection.close()
+
+            if result == None:
+                return False
+            else:
+                return True
+        
+        return None
+
+
+    def get_user_cart(self, email):
+        if self.connect():
+            query = "SELECT item_id, quantity FROM Cart WHERE email='{}'".format(email)
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+            self.connection.close()
+
+            if result != None:
+                return result
+
+        return None
+
+    # method to increase quantity of item already in Cart
+    def increase_quantity(self, email, item_id):
+        if self.connect():
+            query = """UPDATE Cart SET quantity=quantity + 1  
+                       WHERE email='{}' AND item_id={}""".format(email, item_id)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        
         return False

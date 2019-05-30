@@ -17,12 +17,15 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
 @app.route('/')
 def home():
-    return render_template('index.html')
+    if 'logged_in' in session:
+        if session['logged_in'] and len(session['email']) > 0:
+            return render_template('dashboard.html')
 
+    return redirect(url_for("login"))
 
+    
 @app.route('/signup', methods=["GET", "POST"])
 def user_signup():
     error = None
@@ -107,32 +110,23 @@ def login():
     
             session['logged_in'] = True
             # redirect to dashboard
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("home"))
         
         else:
             error = "Invalid username or password. Please try again!"
 
     if "logged_in" in session:
         if session['logged_in']:
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("home"))
 
     return render_template("login.html", error=error)
 
 
-
-@app.route('/dashboard')
-def dashboard():
-    if 'logged_in' in session:
-        if session['logged_in'] and len(session['email']) > 0:
-            data = [session['email'], session['first_name']]
-            return render_template('dashboard.html', data=data)
-
-    return redirect(url_for("login"))
-
-
-@app.route('/logout')
-def logout():
+@app.route('/signout')
+def signout():
     session.pop('logged_in', None)
+    session.pop('email', None)
+    session.pop('first_name', None)
     return redirect(url_for('login'))
 
 
@@ -280,9 +274,10 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', data=data)
 
 
-@app.route('/admin_logout')
-def admin_logout():
+@app.route('/admin_signout')
+def admin_signout():
     session.pop('admin_logged_in', None)
+    session.pop('email', None)
     return redirect(url_for('admin_login'))
 
 
@@ -321,6 +316,7 @@ def show_item(id):
 
             endpoint = API_ENDPOINT + "add_to_cart"
             response = re.post(url=endpoint, data=params)
+            print(response.text)
             response = json.loads(response.text)
 
             if response["result"] == "success":
@@ -328,7 +324,6 @@ def show_item(id):
             else:
                 data['msg'] = "Error adding item to cart"
 
-            return redirect(url_for("/item/" + item_id))
         else:
             data['msg'] = "Sign in first"
 
@@ -347,16 +342,32 @@ def show_item(id):
     return "<html>Item not found</html>"
 
 
-@app.route('/images/<path:path>')
-def serve_image(path):
-    if allowed_file(path):
-        return send_from_directory('static/images', path)
+@app.route('/cart')
+def cart():
+    data = {'msg' : None,
+            'cart': None}
 
+    if 'logged_in' in session and 'email' in session:
+            email = session['email']
 
-@app.route('/js/<path:path>')
-def serve_js(path):
-    if path[-2:] == "js":
-        return send_from_directory('static/js', path)
+            params = {"email" : email,
+                      "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "cart"
+            response = re.post(url=endpoint, data=params)
+            response = json.loads(response.text)
+
+            if response['result'] == "success":
+                data['cart'] = response['cart']
+            elif response['result'] == "empty":
+                data['msg'] = "Your cart is empty"
+            else:
+                data['msg'] = "Error viewing cart"
+        
+    else:
+        data['msg'] = "Login to see your cart"
+
+    return render_template('cart.html', data=data)
 
 
 # helper functions
