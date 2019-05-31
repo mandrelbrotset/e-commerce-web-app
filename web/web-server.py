@@ -19,11 +19,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def home():
-    if 'logged_in' in session:
+    """ if 'logged_in' in session:
         if session['logged_in'] and len(session['email']) > 0:
-            return render_template('dashboard.html')
+            return render_template('home.html')
 
-    return redirect(url_for("login"))
+    return redirect(url_for("login")) """
+    
+    return render_template('home.html')
 
     
 @app.route('/signup', methods=["GET", "POST"])
@@ -212,15 +214,11 @@ def admin_login():
     
             session['admin_logged_in'] = True
             # redirect to dashboard
-
-            print("Logging in")
-
             return redirect(url_for("admin_dashboard"))
-        
         else:
             error = "Invalid username or password. Please try again!"
 
-    if "admin_logged_in" in session:
+    if "admin_logged_in" in session and 'email' in session:
         if session['admin_logged_in']:
             return redirect(url_for("admin_dashboard"))
 
@@ -230,6 +228,7 @@ def admin_login():
 @app.route('/admin_dashboard', methods=["GET", "POST"])
 def admin_dashboard():
     data = {}
+    data['msg_type'] = None
     data['msg'] = None
 
     if "admin_logged_in" in session:
@@ -253,28 +252,29 @@ def admin_dashboard():
                 if image.filename == "":
                     data['msg'] = "No selected file"
 
-                image_url = ""
                 if image and allowed_file(image.filename):
                     filename = secure_filename(image.filename)
                     image_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    image.save(filename)
+                    image.save(image_url)
 
-                params = {"name" : name,
-                        "quantity" : quantity,
-                        "tags" : tags,
-                        "description" : description,
-                        "price" : price,
-                        "image_url" : filename,
-                        "key" : API_KEY}
+                    params = {"name" : name,
+                            "quantity" : quantity,
+                            "tags" : tags,
+                            "description" : description,
+                            "price" : price,
+                            "image_url" : filename,
+                            "key" : API_KEY}
 
-                endpoint = API_ENDPOINT + "add_item"
-                response = re.post(url=endpoint, data=params)
-                response = json.loads(response.text)
+                    endpoint = API_ENDPOINT + "add_item"
+                    response = re.post(url=endpoint, data=params)
+                    response = json.loads(response.text)
 
-                if response["result"] == "success":
-                    data['msg'] = "Item added to stock"
-                else:
-                    data['msg'] = "Error adding item to stock"
+                    if response["result"] == "success":
+                        data['msg'] = "Item added to stock"
+                        data['msg_type'] = "success"
+                    else:
+                        data['msg'] = "Error adding item to stock"
+                        data['msg_type'] = "error"
 
     return render_template('admin_dashboard.html', data=data)
 
@@ -354,26 +354,226 @@ def cart():
             'cart': None}
 
     if 'logged_in' in session and 'email' in session:
-            email = session['email']
+        email = session['email']
 
-            params = {"email" : email,
-                      "key" : API_KEY}
+        params = {"email" : email,
+                    "key" : API_KEY}
 
-            endpoint = API_ENDPOINT + "cart"
+        endpoint = API_ENDPOINT + "cart"
+        response = re.post(url=endpoint, data=params)
+        response = json.loads(response.text)
+
+        if response['result'] == "success":
+            data['cart'] = response['cart']
+        elif response['result'] == "empty":
+            data['msg'] = "Your cart is empty"
+        else:
+            data['msg'] = "Error viewing cart"
+        
+    else:
+        data['msg'] = "Log in to see your cart"
+
+    return render_template('cart.html', data=data)
+
+
+@app.route('/account')
+def account():
+    data = {'msg' : None,
+            'first_name' : None,
+            'last_name' : None}
+
+    if 'logged_in' in session:
+        if session['logged_in']:
+            params = {"email" : session['email'],
+                    "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "account"
             response = re.post(url=endpoint, data=params)
             response = json.loads(response.text)
 
             if response['result'] == "success":
-                data['cart'] = response['cart']
-            elif response['result'] == "empty":
-                data['msg'] = "Your cart is empty"
-            else:
-                data['msg'] = "Error viewing cart"
-        
+                data['first_name'] = response['first_name']
+                data['last_name'] = response['last_name']
     else:
-        data['msg'] = "Login to see your cart"
+        data['msg'] = "Log in to see your account details"
 
-    return render_template('cart.html', data=data)
+    return render_template('account.html', data=data)
+
+
+@app.route('/delete_account')
+def delete_account():
+    if 'logged_in' in session:
+        if session['logged_in']:
+            params = {"email" : session['email'],
+                      "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "delete_account"
+            response = re.post(url=endpoint, data=params)
+            response = json.loads(response.text)
+
+            session.pop('logged_in', None)
+            session.pop('email', None)
+            session.pop('first_name', None)
+    
+            return redirect(url_for('home'))
+
+
+@app.route('/change_name', methods=["POST"])
+def change_name():
+    data = {'msg' : None}
+
+    if request.method == "POST":
+        email = session['email']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+
+        params = {"email" : email,
+                  "first_name" : first_name.title(),
+                  "last_name" : last_name.title(),
+                  "key" : API_KEY}
+
+        # change first name stored in session
+        if len(first_name):
+            session['first_name'] = first_name
+
+        endpoint = API_ENDPOINT + "change_name"
+        response = re.post(url=endpoint, data=params)
+        response = response.json()
+
+        if response['result'] == "success":
+            data['msg'] = "Changed name successfully!"
+        else:
+            data['msg'] = "Error changing name."
+
+        print(data['msg'])
+        return redirect(url_for('account'))
+
+
+@app.route('/change_password', methods=["POST"])
+def change_password():
+    data = {'msg' : None}
+
+    if request.method == "POST":
+        email = session['email']
+        password = request.form['password']
+
+        params = {"email" : email,
+                  "password" : password,
+                  "key" : API_KEY}
+
+        endpoint = API_ENDPOINT + "change_password"
+        response = re.post(url=endpoint, data=params)
+        response = response.json()
+
+        if response['result'] == "success":
+            data['msg'] = "Changed password successfully!"
+        else:
+            data['msg'] = "Error changing password."
+
+        print(data['msg'])
+        return redirect(url_for('account'))
+
+
+
+@app.route('/admin_account')
+def admin_account():
+    data = {'msg' : None,
+            'first_name' : None,
+            'last_name' : None}
+
+    if 'admin_logged_in' in session:
+        if session['admin_logged_in']:
+            params = {"email" : session['email'],
+                    "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "admin_account"
+            response = re.post(url=endpoint, data=params)
+            response = json.loads(response.text)
+
+            if response['result'] == "success":
+                data['first_name'] = response['first_name']
+                data['last_name'] = response['last_name']
+    else:
+        data['msg'] = "Log in to see your account details"
+
+    return render_template('admin_account.html', data=data)
+
+
+@app.route('/delete_admin_account')
+def delete_admin_account():
+    if 'admin_logged_in' in session:
+        if session['admin_logged_in']:
+            params = {"email" : session['email'],
+                      "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "delete_admin_account"
+            response = re.post(url=endpoint, data=params)
+            response = json.loads(response.text)
+
+            session.pop('admin_logged_in', None)
+            session.pop('email', None)
+            session.pop('first_name', None)
+    
+            return redirect(url_for('home'))
+
+
+@app.route('/change_admin_name', methods=["POST"])
+def change_admin_name():
+    data = {'msg' : None}
+
+    if request.method == "POST":
+        email = session['email']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+
+        params = {"email" : email,
+                  "first_name" : first_name.title(),
+                  "last_name" : last_name.title(),
+                  "key" : API_KEY}
+
+        # change first name stored in session
+        if len(first_name):
+            session['first_name'] = first_name
+
+        endpoint = API_ENDPOINT + "change_admin_name"
+        response = re.post(url=endpoint, data=params)
+        response = response.json()
+
+        if response['result'] == "success":
+            data['msg'] = "Changed name successfully!"
+        else:
+            data['msg'] = "Error changing name."
+
+        print(data['msg'])
+        return redirect(url_for('admin_account'))
+        
+
+
+@app.route('/change_admin_password', methods=["POST"])
+def change_admin_password():
+    data = {'msg' : None}
+
+    if request.method == "POST":
+        email = session['email']
+        password = request.form['password']
+
+        params = {"email" : email,
+                  "password" : password,
+                  "key" : API_KEY}
+
+        endpoint = API_ENDPOINT + "change_admin_password"
+        response = re.post(url=endpoint, data=params)
+        response = response.json()
+
+        if response['result'] == "success":
+            data['msg'] = "Changed password successfully!"
+        else:
+            data['msg'] = "Error changing password."
+
+        print(data['msg'])
+        return redirect(url_for('admin_account'))
+
+
 
 
 # helper functions

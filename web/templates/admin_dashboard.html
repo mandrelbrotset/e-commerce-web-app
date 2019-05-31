@@ -1,71 +1,116 @@
 {% extends "base.html" %}
 {% block content %}
+    <style>
+        .post-item {
+            width: 50%;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-        <h1>Administrator Page</h1>
-        <h2>Welcome back {{data['first_name']}}</h2>
+        h2, h3 {
+            text-align: center;
+            padding-top: 15px;
+        }
 
-        <div>
-            <form method="POST" enctype="multipart/form-data">
-                <p>Item name</p>
-                <input type="text" name="name">
-                <p>Price</p>
-                <input type="number" name="price" step="0.01">
-                <p>Quantity</p>
-                <input type="number" name="quantity">
-                <p>Description</p>
-                <input type="text" name="description">
-                <p>Tags (enter multiple tags separated by comma)</p>
-                <input type="text" name="tags">
-                <br><br>
-                <input type="file" name="image">
-                <br><br>
-                <input type="submit" value="Add to stock">
-                {% if data['msg'] %}
-                    <br><br>
-                    <h3>{{ data['msg'] }}</h3>
-                    <br><br>
-                {% endif %}
-            </form>
-        </div>
+        .item-listing {
+            margin-top: 20px;
+        }
 
-        <style>
-            #loading {
-                display: block;
-                width: 300px;
-                margin-top: 90px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-    
-            .cart-group {
-                width: 80%;
-                margin: 20px auto;
-            }
-    
-            .cart-group img {
-                float: left;
-            }
-            .side-content {
-                float: left;
-                padding-left: 10px;
-                padding-top: 35px;
-            }
-            
-            .side-content p {
-                padding-left: 25px;
-            }
-    
-            .side-content small {
-                padding-left: 25px;
-            }
-        </style>
-        <div>
-            <div id="product">
-                <img src="{{ url_for('static', filename='images/loading.gif') }}" id="loading">
+        .add-item-btn {
+            width: 30%;
+            margin-left: 35%;
+            margin-right: 35%;
+        }
+
+        .upload-btn {
+            box-shadow: 0px;
+            -moz-window-shadow: 0px;
+        }
+
+    </style>
+
+    <div class="post-item">
+        <h2>Administrator page</h2>
+        <h3>Add item to stock</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Item name</span>
+                </div>
+                <input type="text" name="name" style="width:658px;">
             </div>
-            <script type="text/javascript" src="{{ url_for('static', filename='js/load_products.js') }}"></script>
-        </div>
 
-        <p><a href="/admin_signout">Sign out</a></p>
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Price $</span>
+                </div>
+                <input type="text" name="price" style="width:275px;" step="0.01">
+
+                <div class="input-group-prepend" style="margin-left:52px;">
+                        <span class="input-group-text" id="">Quantity</span>
+                </div>
+                <input type="number" name="quantity" style="width:275px;">
+            </div>
+
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Description</span>
+                </div>
+                <input type="text" name="description" style="width:654px;">
+            </div>
+
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Tags</span>
+                </div>
+                <input type="text" name="tags" style="width:702px;" 
+                    placeholder="Enter multiple tags separated by comma">
+            </div>
+
+            <div class="input-group mb-3">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="inputGroupFile02" name="image" />
+                        <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
+                    </div>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary">Upload</button>
+                    </div>
+                </div>
+                <script>
+                    $('#inputGroupFile02').on('change',function(){
+                        //get the file name
+                        var fileName = $(this).val();
+                        //replace the "Choose a file" label
+                        $(this).next('.custom-file-label').html(fileName);
+                    })
+                </script>
+
+            <input type="submit" value="Add to stock" class="btn btn-primary add-item-btn">
+
+            {% if data['msg'] and data['msg_type'] %}
+                {% if data['msg_type'] == "success" %}
+                    <br><br>
+                    <div class="alert alert-success">
+                        <strong>Success!</strong> {{ data['msg'] }}
+                    </div>
+                {% else %}
+                    <br><br>
+                    <div class="alert alert-warning">
+                        <strong>Success!</strong> {{ data['msg'] }}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="item-listing">
+        <h3>Items in Stock</h3>
+        <div id="product">
+            <img src="{{ url_for('static', filename='images/loading.gif') }}" id="loading">
+        </div>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/load_products.js') }}"></script>
+    </div>
     
 {% endblock %}

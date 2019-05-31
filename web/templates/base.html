@@ -14,6 +14,39 @@
             margin-right: 10px;
         }
 
+        /* ---- Style for home ----- */
+        #loading {
+            display: block;
+            width: 300px;
+            margin-top: 90px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cart-group {
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .cart-group img {
+            float: left;
+        }
+        .side-content {
+            float: left;
+            padding-left: 10px;
+            padding-top: 35px;
+        }
+        
+        .side-content p {
+            padding-left: 25px;
+        }
+
+        .side-content small {
+            padding-left: 25px;
+        }
+        /* ----- End style for home ----- */
+
+
         /*  ---- Style for Login and Sign Up page  */
         .form {
             width: 23.3%;
@@ -32,7 +65,7 @@
             text-align: center;
         }
 
-        .form .ig {
+        .ig {
             margin-top: 15px;
             margin-bottom: 15px;
         }
@@ -44,7 +77,11 @@
 
         input {
             padding: 0px 4px;
+            border: 1px #d4d4d4 solid;
         }    
+
+        /*  ----- End style for Login and Sign up page ----  */
+
     </style>
 </head>
 
@@ -58,17 +95,16 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-
-            </ul>
-
+                
             {% if 'logged_in' in session %}
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Orders<span class="sr-only">(current)</span></a>
+                    </li>
+    
+                </ul>
+
                 <form class="form-inline my-2 my-lg-0">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
@@ -80,7 +116,7 @@
                         Hello, {{ session['first_name'] }}
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">My account</a>
+                        <a class="dropdown-item" href="/account">My account</a>
                         <a class="dropdown-item" href="/signout">Sign out</a>
                     </div>
                 </div>
@@ -89,18 +125,26 @@
                 {% if 'email' in session %}
                 <a href="/cart" class="nav-item btn btn-primary">View Cart</a>
                 {% endif %}
+
             {% elif 'admin_logged_in' in session %}
                 {% if 'first_name' in session %}
-                <div class="dropdown nav-item justify-content-end hello">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        Hello, {{ session['first_name'] }}
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
+
+                <a href="/admin_dashboard" class="nav-item btn btn-info">Admin dashboard</a>
+
+                <div class="dropdown nav-item justify-content-end hello">    
+                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                        Hello, {{ session['first_name'] }} (Admin)
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="#">My account</a>
+                        <a class="dropdown-item" href="/admin_account">My account</a>
                         <a class="dropdown-item" href="/admin_signout">Sign out</a>
                     </div>
                 </div>
                 {% endif %}
+
+            {% else %}
+                <a href="/login" class="nav-item btn btn-primary">Sign in</a>
             {% endif %}
         </div>
     </nav>

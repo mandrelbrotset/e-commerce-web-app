@@ -37,11 +37,11 @@ def user_signup():
                 # convert email to lower case
                 email = email.lower()
 
-                # generate hash for the password
-                salt, hash = generate_hash(password)
-
                 # check if username is available
                 if db.check_user(email):
+                    # generate hash for the password
+                    salt, hash = generate_hash(password)
+
                     if db.add_user(email, f_name, l_name, hash, salt): 
                         return json.dumps({"result" : "success"})
                     else:
@@ -77,11 +77,11 @@ def admin_signup():
                 # convert email to lower case
                 email = email.lower()
 
-                # generate hash for the password
-                salt, hash = generate_hash(password)
-
                 # check if username is available
                 if db.check_admin(email):
+                    # generate hash for the password
+                    salt, hash = generate_hash(password)
+
                     if db.add_admin(email, f_name, l_name, hash, salt): 
                         return json.dumps({"result" : "success"})
                     else:
@@ -138,6 +138,7 @@ def user_login():
 
     return json.dumps({"result" : ERR_5})
 
+
 @app.route('/admin_login', methods=["POST"])
 def admin_login():
     if request.method == "POST":
@@ -175,6 +176,7 @@ def admin_login():
             return json.dumps({"result" : ERR_1})
 
     return json.dumps({"result" : ERR_5})
+
 
 @app.route('/add_item', methods=["POST"])
 def add_item():
@@ -299,6 +301,178 @@ def cart():
     return json.dumps({"result" : ERR_5})
                 
 
+@app.route('/account', methods=["POST"])
+def account():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                f_name, l_name = db.user_details(email)
+
+                return json.dumps({"result": "success",
+                                   "first_name" : f_name,
+                                   "last_name" : l_name})
+            else:
+                return json.dumps({"result" : "empty"})
+
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/change_name', methods=["POST"])
+def change_name():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                first_name = ""
+                last_name = ""
+
+                if 'first_name' in request.form:
+                    first_name = request.form["first_name"]
+
+                if 'last_name' in request.form:
+                    last_name = request.form["last_name"]
+
+                if db.change_name(email, first_name, last_name):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+    
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/change_password', methods=["POST"])
+def change_password():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                password = request.form["password"]
+
+                # generate hash for the password
+                salt, password_hash = generate_hash(password)
+
+                # change password hash and salt in database
+                if db.change_password(email, password_hash, salt):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+    
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/delete_account', methods=["POST"])
+def delete_account():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                
+                if db.delete_user(email):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/admin_account', methods=["POST"])
+def admin_account():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                f_name, l_name = db.admin_details(email)
+
+                return json.dumps({"result": "success",
+                                   "first_name" : f_name,
+                                   "last_name" : l_name})
+            else:
+                return json.dumps({"result" : "empty"})
+
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/change_admin_name', methods=["POST"])
+def change_admin_name():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                first_name = ""
+                last_name = ""
+
+                if 'first_name' in request.form:
+                    first_name = request.form["first_name"]
+
+                if 'last_name' in request.form:
+                    last_name = request.form["last_name"]
+
+                if db.change_admin_name(email, first_name, last_name):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+    
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/change_admin_password', methods=["POST"])
+def change_admin_password():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                password = request.form["password"]
+
+                # generate hash for the password
+                salt, password_hash = generate_hash(password)
+
+                # change password hash and salt in database
+                if db.change_admin_password(email, password_hash, salt):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+    
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/delete_admin_account', methods=["POST"])
+def delete_admin_account():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                email = request.form["email"]
+                
+                if db.delete_admin(email):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+
+    return json.dumps({"result" : ERR_5})
 
 def generate_hash(password):
     passw_salt_len = 20

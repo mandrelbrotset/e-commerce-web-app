@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        /* ---- style for account  ---- */
+        .account-content {
+            width: 28%;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .account-content h2 {
+            padding-top: 15px;
+            text-align: center;
+        }
+
+        .account-content h4 {
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .bio-container {
+            width: 100%;
+            float: left;
+            margin-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .name-email {
+            width: 32%;
+            float: left;
+        }
+
+        .name-value {
+            width: 68%;
+            float: left;
+        }
+
+        .chg-name-btn {
+            width: 40%;
+            margin-left: 30%;
+        }
+
+        .chg-name-btn {
+            width: 40%;
+            margin-left: 30%;
+        }
+
+        .chg-passwd-btn {
+            width: 50%;
+            margin-left: 25%;
+        }
+
+        .delete-btn {
+            margin-top: 60px;
+            width: 60%;
+            margin-left: 20%;
+        }
+    </style>
+
+    <div class="account-content">
+        {% if 'admin_logged_in' in session %}
+            {% if session['admin_logged_in'] %}
+                
+                <h2>Admin Account</h2>
+
+                <div class="bio-container">
+                    <div class="name-email">
+                        <h5>First name: </h5>
+                        <h5>Last name: </h5>
+                        <h5>Email: </h5>
+                    </div>
+    
+                    <div class="name-value">
+                        <h5>{{ data['first_name'] }}</h5>
+                        <h5>{{ data['last_name'] }}</h5>
+                        <h5>{{ session['email'] }}</h5>
+                    </div>
+                </div>
+    
+                <form action="/change_admin_name" method="POST">
+                    <h4>Edit name</h4>
+    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">First name</span>
+                        </div>
+                        <input type="text" name="first_name" style="width:300px;">
+                    </div>
+    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Last name</span>
+                        </div>
+                        <input type="text" name="last_name" style="width:302px;">
+                    </div>
+                        
+                    <input type="submit" value="Change admin name" class="btn btn-primary chg-name-btn">
+                </form>
+
+                <form action="/change_admin_password" method="POST">
+                    <h4>Change password</h4>
+    
+                    <input type="hidden" name="email" value="{{ session['email'] }}">
+
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">New password</span>
+                        </div>
+                        <input type="password" name="password" style="width:274px;">
+                    </div>
+                        
+                    <input type="submit" value="Change admin password" class="btn btn-primary chg-passwd-btn">
+                </form>
+    
+                <a href="/delete_admin_account" class="btn btn-danger delete-btn">Delete admin account</a>
+            {% endif %}
+        {% endif %}
+    
+        {% if data['msg'] %}
+            <div class="alert alert-info" role="alert">
+                {{ data['msg'] }}
+            </div>
+        {% endif %}
+                
+    </div>
+
+{% endblock %}

@@ -139,7 +139,6 @@ class Database(object):
         return None
 
 
-
     def item_quantity(self, item_id):
         if self.connect():
             query = "SELECT quantity FROM Item WHERE id='{}'".format(item_id)
@@ -194,11 +193,128 @@ class Database(object):
 
         return None
 
+
     # method to increase quantity of item already in Cart
     def increase_quantity(self, email, item_id):
         if self.connect():
             query = """UPDATE Cart SET quantity=quantity + 1  
                        WHERE email='{}' AND item_id={}""".format(email, item_id)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        
+        return False
+
+
+    def user_details(self, email):
+        if self.connect():
+            query = "SELECT first_name, last_name FROM Login WHERE email='{}'".format(email)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            self.connection.close()
+
+            return result
+        
+        return None
+
+
+    # method change name
+    def change_name(self, email, first_name, last_name):
+        query = ""
+
+        if len(first_name) > 0 and len(last_name) == 0:
+            query = """UPDATE Login SET first_name='{}'
+                WHERE email='{}'""".format(first_name, email)
+        elif len(first_name) == 0 and len(last_name) > 0:
+            query = """UPDATE Login SET last_name='{}' 
+                WHERE email='{}'""".format(last_name, email)
+        elif len(first_name) > 0 and len(last_name) > 0:
+            query = """UPDATE Login SET first_name='{}', last_name='{}' WHERE email='{}'""" \
+                .format(first_name, last_name, email)
+        
+        if len(query) > 0 and self.connect():
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+
+        return False
+
+
+    def change_password(self, email, password_hash, salt):
+        if self.connect():
+            query = """UPDATE Login SET password='{}', hash_salt='{}' WHERE email='{}'""" \
+                .format(password_hash, salt, email)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+
+        return False
+
+
+    def delete_user(self, email):
+        if self.connect():
+            query = "DELETE FROM Login WHERE email='{}'".format(email)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        
+        return False
+
+
+    def admin_details(self, email):
+        if self.connect():
+            query = "SELECT first_name, last_name FROM Admin WHERE email='{}'".format(email)
+            self.cursor.execute(query)
+            result = self.cursor.fetchone()
+            self.connection.close()
+
+            return result
+        
+        return None
+
+
+    # method change name
+    def change_admin_name(self, email, first_name, last_name):
+        query = ""
+
+        if len(first_name) > 0 and len(last_name) == 0:
+            query = """UPDATE Admin SET first_name='{}'
+                WHERE email='{}'""".format(first_name, email)
+        elif len(first_name) == 0 and len(last_name) > 0:
+            query = """UPDATE Admin SET last_name='{}' 
+                WHERE email='{}'""".format(last_name, email)
+        elif len(first_name) > 0 and len(last_name) > 0:
+            query = """UPDATE Admin SET first_name='{}', last_name='{}' WHERE email='{}'""" \
+                .format(first_name, last_name, email)
+        
+        if len(query) > 0 and self.connect():
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+
+        return False
+
+
+    def change_admin_password(self, email, password_hash, salt):
+        if self.connect():
+            query = """UPDATE Admin SET password='{}', hash_salt='{}' WHERE email='{}'""" \
+                .format(password_hash, salt, email)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+
+        return False
+
+
+    def delete_admin(self, email):
+        if self.connect():
+            query = "DELETE FROM Admin WHERE email='{}'".format(email)
             self.cursor.execute(query)
             self.connection.commit()
             self.connection.close()
