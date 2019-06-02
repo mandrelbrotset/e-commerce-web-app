@@ -212,8 +212,9 @@ def get_items():
                 products = []
 
                 for item in items:
-                    products.append([item[0], item[1], item[2], item[3],\
-                     item[4], float(item[5]), item[6]])
+                    products.append({"id":item[0], "name":item[1], "quantity":item[2],
+                                     "tags":item[3], "description":item[4], 
+                                     "price":float(item[5]), "image_url":item[6]})
 
                 ret = {"result" : "success",
                        "items" : products}
@@ -474,6 +475,52 @@ def delete_admin_account():
 
     return json.dumps({"result" : ERR_5})
 
+
+@app.route('/delete_item', methods=["POST"])
+def delete_item():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                item_id = request.form["item_id"]
+                
+                if db.delete_item(item_id):
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+
+    return json.dumps({"result" : ERR_5})
+
+
+@app.route('/edit_item', methods=["POST"])
+def edit_item():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form["key"]
+
+            # check for API Key
+            if key == API_KEY:
+                item_id = request.form["item_id"]
+                quantity = request.form["quantity"]
+                name = request.form["name"]
+                tags = request.form["tags"]
+                description = request.form["description"]
+                price = request.form["price"]
+                image_url = request.form["image_url"]
+                
+                result = db.edit_item(item_id, name, tags, quantity, price, description, image_url)
+
+                if result:
+                    return json.dumps({"result" : "success"})
+
+                return json.dumps({"result" : "failed"})
+
+    return json.dumps({"result" : ERR_5})
+
+
+# helper function to generate password hash and salt
 def generate_hash(password):
     passw_salt_len = 20
     length = len(password)

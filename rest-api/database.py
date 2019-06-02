@@ -321,3 +321,27 @@ class Database(object):
             return True
         
         return False
+
+
+    def delete_item(self, id):
+        if self.connect():
+            query = "DELETE FROM Item WHERE id='{}'".format(id)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        
+        return False
+
+
+    def edit_item(self, item_id, name, tags, quantity, price, description, image_url):
+        if self.connect():
+            query = """UPDATE Item SET name='{}', tags='{}', quantity='{}', price='{}',
+                       description='{}', image_url='{}' WHERE id={}""".format(name, 
+                       tags, quantity, price, description, image_url, item_id)
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+            return True
+        
+        return False

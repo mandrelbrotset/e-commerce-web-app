@@ -225,7 +225,7 @@ def admin_login():
     return render_template("admin_login.html", error=error)
 
 
-@app.route('/admin_dashboard', methods=["GET", "POST"])
+@app.route('/admin_dashboard')
 def admin_dashboard():
     data = {}
     data['msg_type'] = None
@@ -277,6 +277,135 @@ def admin_dashboard():
                         data['msg_type'] = "error"
 
     return render_template('admin_dashboard.html', data=data)
+
+
+
+@app.route('/add_item')
+def add_item():
+    data = {}
+    data['msg_type'] = None
+    data['msg'] = None
+
+    if "admin_logged_in" in session:
+        if session['admin_logged_in']:
+            if request.method == "POST":
+                name = request.form["name"]
+                quantity = request.form["quantity"]
+                tags = request.form["tags"]
+                description = request.form["description"]
+                price = request.form["price"]
+                
+                if 'image' not in request.files:
+                    data['msg'] = "Upload an image"
+
+                image = request.files['image']
+                
+                if image.filename == "":
+                    data['msg'] = "No selected file"
+
+                if image and allowed_file(image.filename):
+                    filename = secure_filename(image.filename)
+                    image_url = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    image.save(image_url)
+
+                    params = {"name" : name,
+                            "quantity" : quantity,
+                            "tags" : tags,
+                            "description" : description,
+                            "price" : price,
+                            "image_url" : filename,
+                            "key" : API_KEY}
+
+                    endpoint = API_ENDPOINT + "add_item"
+                    response = re.post(url=endpoint, data=params)
+                    response = json.loads(response.text)
+
+                    if response["result"] == "success":
+                        data['msg'] = "Item added to stock"
+                        data['msg_type'] = "success"
+                    else:
+                        data['msg'] = "Error adding item to stock"
+                        data['msg_type'] = "error"
+
+                return render_template('add_item.html', data=data)
+
+        return render_template('add_item.html', data=data)
+    else:
+        return redirect(url_for('admin_login'))
+
+
+
+# work on this function !!!!1
+@app.route('/edit_item/', methods=["GET", "POST"])
+def edit_item():
+    data = {'msg':None, 'items':None}
+
+    if "admin_logged_in" in session:
+        if session['admin_logged_in']:
+            if request.method == "POST":
+                item_id = request.form["item_id"]
+                name = request.form["name"]
+                quantity = request.form["quantity"]
+                tags = request.form["tags"]
+                description = request.form["description"]
+                price = request.form["price"]
+
+                image_name = ""
+
+                # save image
+                if 'image' in request.files:
+                    image = request.files['image']
+                
+                    if image.filename == "":
+                        data['msg'] = "No selected file"
+
+                    if image and allowed_file(image.filename):
+                        image_name = secure_filename(image.filename)
+                        image_url = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+                        image.save(image_url)
+
+                params = {"item_id" : item_id,
+                        "name" : name,
+                        "quantity" : quantity,
+                        "tags" : tags,
+                        "description" : description,
+                        "price" : price,
+                        "image_url" : image_name,
+                        "key" : API_KEY}
+
+                print(params)
+
+                endpoint = API_ENDPOINT + "edit_item"
+                response = re.post(url=endpoint, data=params)
+
+                if response.status_code == 200:
+                    response = response.json()
+
+                    if response['result'] == "success":
+                        data['msg'] = "Saved!"
+                        print(data['msg'])
+                else:
+                    data['msg'] = "Server error"
+                    
+                return render_template('edit_item.html', data=data)
+            else:
+                params = {"key" : API_KEY}
+                endpoint = API_ENDPOINT + "get_items"
+                response = re.post(url=endpoint, data=params)
+                response = json.loads(response.text)
+
+                if response['result'] == "success":
+                    products = response['items']
+                    data['items'] = products
+                else:
+                    data['msg'] = "Error showing items"
+
+                return render_template('edit_item.html', data=data)
+
+
+    return "<h1>Sign in as admin first</h1>"
+
+
 
 
 @app.route('/admin_signout')
@@ -548,7 +677,6 @@ def change_admin_name():
         return redirect(url_for('admin_account'))
         
 
-
 @app.route('/change_admin_password', methods=["POST"])
 def change_admin_password():
     data = {'msg' : None}
@@ -572,8 +700,6 @@ def change_admin_password():
 
         print(data['msg'])
         return redirect(url_for('admin_account'))
-
-
 
 
 # helper functions

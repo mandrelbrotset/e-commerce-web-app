@@ -29,15 +29,15 @@ function showProducts(products) {
     for (i = 0; i < products.length; i++) {
         console.log(products[i])
 
-        data = data + `<a href="item/` + products[i][0] + `" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <img src="static/images/` + products[i][6] + `" style="width:320px;height:250px;" />
+        data = data + `<a href="item/` + products[i]['id'] + `" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <img src="static/images/` + products[i]['image_url'] + `" style="width:320px;height:250px;" />
                             <div class="side-content">
                                 <div class="d-inline-flex p-3">
-                                   <div class="p-2" style="width:700px;"><h4>` + products[i][1] + `</h4></div>
-                                   <div class="p-2"><h4>$` + products[i][5] + `</h4></div>
+                                   <div class="p-2" style="width:700px;"><h4>` + products[i]['name'] + `</h4></div>
+                                   <div class="p-2"><h4>$` + products[i]['price'] + `</h4></div>
                                 </div>
-                                <p class="card-text">` + products[i][4] + `</p>
-                                <small>` + products[i][3] + `</small>
+                                <p class="card-text">` + products[i]['description'] + `</p>
+                                <small>` + products[i]['tags'] + `</small>
                             </div>
                        </a>`
     }

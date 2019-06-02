@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+        
     <style>
-        .post-item {
+        .dashboard {
             width: 50%;
             margin-top: 20px;
             margin-left: auto;
@@ -30,79 +31,9 @@
 
     </style>
 
-    <div class="post-item">
-        <h2>Administrator page</h2>
-        <h3>Add item to stock</h3>
-
-        <form method="POST" enctype="multipart/form-data">
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Item name</span>
-                </div>
-                <input type="text" name="name" style="width:658px;">
-            </div>
-
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Price $</span>
-                </div>
-                <input type="text" name="price" style="width:275px;" step="0.01">
-
-                <div class="input-group-prepend" style="margin-left:52px;">
-                        <span class="input-group-text" id="">Quantity</span>
-                </div>
-                <input type="number" name="quantity" style="width:275px;">
-            </div>
-
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Description</span>
-                </div>
-                <input type="text" name="description" style="width:654px;">
-            </div>
-
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Tags</span>
-                </div>
-                <input type="text" name="tags" style="width:702px;" 
-                    placeholder="Enter multiple tags separated by comma">
-            </div>
-
-            <div class="input-group mb-3">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="inputGroupFile02" name="image" />
-                        <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
-                    </div>
-                    <div class="input-group-append">
-                        <button class="btn btn-primary">Upload</button>
-                    </div>
-                </div>
-                <script>
-                    $('#inputGroupFile02').on('change',function(){
-                        //get the file name
-                        var fileName = $(this).val();
-                        //replace the "Choose a file" label
-                        $(this).next('.custom-file-label').html(fileName);
-                    })
-                </script>
-
-            <input type="submit" value="Add to stock" class="btn btn-primary add-item-btn">
-
-            {% if data['msg'] and data['msg_type'] %}
-                {% if data['msg_type'] == "success" %}
-                    <br><br>
-                    <div class="alert alert-success">
-                        <strong>Success!</strong> {{ data['msg'] }}
-                    </div>
-                {% else %}
-                    <br><br>
-                    <div class="alert alert-warning">
-                        <strong>Success!</strong> {{ data['msg'] }}
-                    </div>
-                {% endif %}
-            {% endif %}
-        </form>
+    <div class="dashboard">
+        <a href="/add_item" class="btn">Add Item to Stock</a>
+        <a href="/edit_item" class="btn">Edit Item in Stock</a>
     </div>
 
     <div class="item-listing">
