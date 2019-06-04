@@ -12,10 +12,11 @@ API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
 UPLOAD_FOLDER = "static/images"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'svg'])
 
-
+# flask config
 app = Flask(__name__, static_folder='static')
 app.secret_key = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 @app.route('/')
 def home():
@@ -30,7 +31,6 @@ def home():
     
 @app.route('/signup', methods=["GET", "POST"])
 def user_signup():
-    error = None
 
     if request.method == "POST":
         print(request.form)
@@ -188,14 +188,14 @@ def admin_signup():
 
 
 @app.route('/admin',  methods=["GET", "POST"])
-def admin_login():
+def admin_signin():
     error = None
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
 
         # Rest API endpoint
-        endpoint = API_ENDPOINT + "admin_login"
+        endpoint = API_ENDPOINT + "admin_signin"
 
         params = {"email" : email,
                   "password" : password,
@@ -222,7 +222,7 @@ def admin_login():
         if session['admin_logged_in']:
             return redirect(url_for("admin_dashboard"))
 
-    return render_template("admin_login.html", error=error)
+    return render_template("admin_signin.html", error=error)
 
 
 @app.route('/admin_dashboard')
@@ -279,7 +279,6 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', data=data)
 
 
-
 @app.route('/add_item')
 def add_item():
     data = {}
@@ -331,14 +330,13 @@ def add_item():
 
         return render_template('add_item.html', data=data)
     else:
-        return redirect(url_for('admin_login'))
-
+        return redirect(url_for('admin_signin'))
 
 
 # work on this function !!!!1
-@app.route('/edit_item/', methods=["GET", "POST"])
+@app.route('/edit_item', methods=["GET", "POST"])
 def edit_item():
-    data = {'msg':None, 'items':None}
+    data = None
 
     if "admin_logged_in" in session:
         if session['admin_logged_in']:
@@ -357,7 +355,7 @@ def edit_item():
                     image = request.files['image']
                 
                     if image.filename == "":
-                        data['msg'] = "No selected file"
+                        session['msg'] = "No selected file"
 
                     if image and allowed_file(image.filename):
                         image_name = secure_filename(image.filename)
@@ -373,8 +371,6 @@ def edit_item():
                         "image_url" : image_name,
                         "key" : API_KEY}
 
-                print(params)
-
                 endpoint = API_ENDPOINT + "edit_item"
                 response = re.post(url=endpoint, data=params)
 
@@ -382,10 +378,9 @@ def edit_item():
                     response = response.json()
 
                     if response['result'] == "success":
-                        data['msg'] = "Saved!"
-                        print(data['msg'])
+                        session['msg'] = "Saved!"
                 else:
-                    data['msg'] = "Server error"
+                    session['msg'] = "Server error"
                     
                 return render_template('edit_item.html', data=data)
             else:
@@ -396,16 +391,35 @@ def edit_item():
 
                 if response['result'] == "success":
                     products = response['items']
-                    data['items'] = products
+                    data = products
                 else:
-                    data['msg'] = "Error showing items"
+                    session['msg'] = "Error showing items"
 
                 return render_template('edit_item.html', data=data)
 
+    return redirect(url_for('admin_signin'))
 
-    return "<h1>Sign in as admin first</h1>"
 
+@app.route('/delete_item', methods=["POST"])
+def delete_item():
+    if "admin_logged_in" in session:
+        if session['admin_logged_in']:
+            if request.method == "POST":
+                item_id = request.form["item_id"]
 
+                params = {"item_id" : item_id,
+                          "key" : API_KEY}
+
+                endpoint = API_ENDPOINT + "delete_item"
+                response = re.post(url=endpoint, data=params)
+
+                if response.status_code == 200:
+                    response = response.json()
+                    session['msg'] = "Item deleted successfully!"
+                else:
+                    session['msg'] = "Error deleting item"
+
+                return redirect(url_for('edit_item'))
 
 
 @app.route('/admin_signout')
@@ -413,7 +427,7 @@ def admin_signout():
     session.pop('admin_logged_in', None)
     session.pop('email', None)
     session.pop('first_name', None)
-    return redirect(url_for('admin_login'))
+    return redirect(url_for('admin_signin'))
 
 
 @app.route('/get_products', methods=["GET"])
@@ -603,7 +617,6 @@ def change_password():
         return redirect(url_for('account'))
 
 
-
 @app.route('/admin_account')
 def admin_account():
     data = {'msg' : None,
@@ -700,6 +713,9 @@ def change_admin_password():
 
         print(data['msg'])
         return redirect(url_for('admin_account'))
+
+
+
 
 
 # helper functions

@@ -20,10 +20,11 @@ xhr.send(null);
 
 function showProducts(products) {
     var elem = document.getElementById('loading');
+    // hide loading gif
     elem.style.display = 'hidden';
-
+    // parse json data containing item details
     var products = JSON.parse(products);
-    console.log(products);
+    
     var data = "<div class='list-group cart-group'>";
 
     for (i = 0; i < products.length; i++) {

@@ -139,8 +139,8 @@ def user_login():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/admin_login', methods=["POST"])
-def admin_login():
+@app.route('/admin_signin', methods=["POST"])
+def admin_signin():
     if request.method == "POST":
         if "key" in request.form:
             key = request.form["key"]

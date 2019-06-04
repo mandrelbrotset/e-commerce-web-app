@@ -44,19 +44,28 @@
             xhr.open("POST", apiURL);
             xhr.send(formData);
         }
+
+        function hide_message() {
+            var x = document.getElementById("message");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        } 
     </script>
 
-
-
-    {% if data['msg'] %}
-    <div class="alert alert-info" role="alert">
-        {{ data['msg'] }}
-    </div>
+    {% if 'msg' in session %}
+        {% if session['msg'] %}
+            <button id="message" onclick="hide_message()" class="alert alert-info" role="alert">
+                {{ session['msg'] }}
+            </button>
+        {% endif %}
     {% endif %}
 
-    {% if data['items'] %}
+    {% if data %}
         <div class='list-group cart-group'>
-        {% for item in data['items'] %}
+        {% for item in data %}
             <div class="list-group-item list-group-item-action flex-column align-items-start" id="{{ item['id'] }}">
                 <img src="{{ url_for('static', filename="images/" + item['image_url']) }}" style="width:320px;height:250px;" />
                 <input type="file" name="image" />
@@ -65,7 +74,16 @@
                 <input type="number" name="quantity" value="{{ item['quantity'] }}" />
                 <input type="text" name="description" value="{{ item['description'] }}" />
                 <input type="text" name="tags" value="{{ item['tags'] }}" />
+                
                 <button name="button" onclick="send(this)">Save</button>
+
+                <form action="/delete_item" method="POST">
+                    <input type="hidden" name="item_id" value="{{ item['id'] }}" />
+                    <button class="btn btn-default btn-sm" type=submit>
+                        <span class="glyphicon glyphicon-trash"></span> Delete item
+                    </button>
+                </form>
+                
             </div>
         {% endfor %}
         </div>
