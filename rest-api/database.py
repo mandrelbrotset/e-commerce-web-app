@@ -16,7 +16,6 @@ class Database(object):
             self.cursor = self.connection.cursor()
             return True
         except:
-            print("Couldn't connect to database")
             return False
             
 
@@ -342,6 +341,70 @@ class Database(object):
             self.cursor.execute(query)
             self.connection.commit()
             self.connection.close()
+            
             return True
         
+        return False
+
+
+    def add_address(self, address_id, address):
+        if self.connect():
+            query = """INSERT INTO Address(address_id, street, apt_no, city, state, zip_code, country)
+                    VALUES('{}', '{}', '{}', '{}', '{}', '{}', '{}')""".\
+                    format(address_id, address['street'], address['apt_no'], address['city'],
+                     address['state'], address['zip_code'], address['country'])
+
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+
+            return True
+
+        return False
+
+    def order_items(self, order_id, email):
+        if self.connect():
+            # get items currently in the users cart, use email as condition
+            query = """SELECT i.name, i.price, c.quantity, c.item_id 
+                        FROM Cart c 
+                        JOIN Item i 
+                            ON c.item_id = i.id 
+                        WHERE email='{}'""".format(email)
+            self.cursor.execute(query)
+            items = self.cursor.fetchall()
+
+            # move cart items to OrderItems
+            query = "INSERT INTO OrderItem(order_id, name, price, quantity, item_id) VALUES"
+
+            no_of_items = len(items)
+            for i in range(no_of_items):
+                query += ("('{}', '{}', {}, {}, {})".format(order_id, items[i][0], \
+                                                float(items[i][1]), items[i][2], items[i][3]))
+                if i + 1 < no_of_items:
+                    query += (", ")
+            self.cursor.execute(query)
+
+            # delete items in the cart that have just been ordered
+            query = "DELETE FROM Cart WHERE email='{}'".format(email)
+            self.cursor.execute(query)
+
+            self.connection.commit()
+            self.connection.close()
+
+            return True
+
+        return False
+
+    def record_order(self, order_id, email, name, phone, total_amount):
+        if self.connect():
+            query = """INSERT INTO OrderDetail(order_id, email, name, phone, total_amount, date)
+                    VALUES('{}', '{}', '{}', '{}', '{}',  now())""".format(order_id, email, \
+                    name, phone, total_amount)
+
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+
+            return True
+
         return False

@@ -97,55 +97,59 @@
         <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
                 
             {% if 'logged_in' in session %}
-                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">Orders<span class="sr-only">(current)</span></a>
-                    </li>
-    
-                </ul>
+                {% if session['logged_in'] %}
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Orders<span class="sr-only">(current)</span></a>
+                        </li>
+        
+                    </ul>
 
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                    <form class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
 
-                {% if 'first_name' in session %}
-                <div class="dropdown nav-item justify-content-end hello">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                        Hello, {{ session['first_name'] }}
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/account">My account</a>
-                        <a class="dropdown-item" href="/signout">Sign out</a>
+                    {% if 'first_name' in session %}
+                    <div class="dropdown nav-item justify-content-end hello">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Hello, {{ session['first_name'] }}
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/account">My account</a>
+                            <a class="dropdown-item" href="/signout">Sign out</a>
+                        </div>
                     </div>
-                </div>
-                {% endif %}
+                    {% endif %}
 
-                {% if 'email' in session %}
-                <a href="/cart" class="nav-item btn btn-primary">View Cart</a>
+                    {% if 'email' in session %}
+                    <a href="/cart" class="nav-item btn btn-primary">View Cart</a>
+                    {% endif %}
                 {% endif %}
 
             {% elif 'admin_logged_in' in session %}
-                {% if 'first_name' in session %}
-                <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
+                {% if session['admin_logged_in'] %}
+                    {% if 'admin_first_name' in session %}
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
 
-                <a href="/admin_dashboard" class="nav-item btn btn-info">Admin dashboard</a>
+                    <a href="/admin_dashboard" class="nav-item btn btn-info">Admin dashboard</a>
 
-                <div class="dropdown nav-item justify-content-end hello">    
-                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-                        Hello, {{ session['first_name'] }} (Admin)
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/admin_account">My account</a>
-                        <a class="dropdown-item" href="/admin_signout">Sign out</a>
+                    <div class="dropdown nav-item justify-content-end hello">    
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                            Hello, {{ session['admin_first_name'] }} (Admin)
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/admin_account">My account</a>
+                            <a class="dropdown-item" href="/admin_signout">Sign out</a>
+                        </div>
                     </div>
-                </div>
+                    {% endif %}
                 {% endif %}
 
             {% else %}
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
-                <a href="/login" class="nav-item btn btn-primary">Sign in</a>
+                <a href="/sign_in" class="nav-item btn btn-primary">Sign in</a>
             {% endif %}
         </div>
     </nav>

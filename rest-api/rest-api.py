@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_hashing import Hashing
 import random
 import json
+import datetime
 from database import Database
 
 app = Flask(__name__)
@@ -16,6 +17,22 @@ ERR_2 = "Username not available"
 ERR_3 = "Failed to create account"
 ERR_4 = "Unable to add item"
 ERR_5 = "Invalid method"
+
+
+# helper function to generate password hash and salt
+def generate_hash(password):
+    passw_salt_len = 20
+    length = len(password)
+    salt_length = passw_salt_len - length
+    salt = ""
+
+    for i in range(salt_length):
+        r = random.randint(97, 122)
+        salt = salt + str(chr(r))
+
+    hash = hashing.hash_value(password, salt=salt)
+
+    return salt, hash
 
 
 @app.route('/signup', methods=["POST"])
@@ -98,8 +115,9 @@ def admin_signup():
 
     return json.dumps({"result" : ERR_5})
 
-@app.route('/login', methods=["POST"])
-def user_login():
+
+@app.route('/sign_in', methods=["POST"])
+def user_sign_in():
     if request.method == "POST":
         if "key" in request.form:
             key = request.form["key"]
@@ -289,8 +307,11 @@ def cart():
                     for val in value:
                         # get more details about the cart item
                         item = db.item_by_id(val[0])
-                        cart.append({"item_id":val[0], "quantity":val[1], "price":float(item[5]), 
-                                     "name":item[1], "image_url":item[6]})
+                        cart.append({"item_id" : val[0],
+                                     "quantity" : val[1], 
+                                     "price" : float(item[5]), 
+                                     "name" : item[1], 
+                                     "image_url" : item[6]})
 
                     ret = {"result" : "success",
                            "cart" : cart}
@@ -520,20 +541,36 @@ def edit_item():
     return json.dumps({"result" : ERR_5})
 
 
-# helper function to generate password hash and salt
-def generate_hash(password):
-    passw_salt_len = 20
-    length = len(password)
-    salt_length = passw_salt_len - length
-    salt = ""
+@app.route('/checkout', methods=["POST"])
+def checkout():
+    if request.method == "POST":
+        if 'key' in request.json:
+            key = request.json['key']
 
-    for i in range(salt_length):
-        r = random.randint(97, 122)
-        salt = salt + str(chr(r))
+            if key == API_KEY:
+                name = request.json['name']
+                email = request.json['email']
+                phone = request.json['phone']
+                address = request.json['address']
+                total_amount = request.json['total_amount']
 
-    hash = hashing.hash_value(password, salt=salt)
+                dt = datetime.datetime.now()
+                # increase randomness by getting 
+                dt_now = dt.strftime("%Y%H%M%S%f")
+                hash_string = name + email + address['street'] + dt_now
+                # hash the string
+                order_id  = hashing.hash_value(hash_string)
 
-    return salt, hash
+                db.record_order(order_id, email, name, phone, total_amount)
+                # store address for the order in the database
+                db.add_address(order_id, address)
+                # move all items from cart to OrderItems
+                db.order_items(order_id, email)
+
+        return json.dumps({"result" : "success"})
+        #return json.dumps({"result" : "failed"})
+
+    return json.dumps({"result" : ERR_5})
 
 
 if __name__ == "__main__":

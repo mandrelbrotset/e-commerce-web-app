@@ -20,20 +20,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route('/')
 def home():
-    """ if 'logged_in' in session:
-        if session['logged_in'] and len(session['email']) > 0:
-            return render_template('home.html')
-
-    return redirect(url_for("login")) """
-    
     return render_template('home.html')
 
     
 @app.route('/signup', methods=["GET", "POST"])
 def user_signup():
-
     if request.method == "POST":
-        print(request.form)
         # get data from html form
         f_name = request.form["first_name"]
         l_name = request.form["last_name"]
@@ -51,8 +43,6 @@ def user_signup():
                       "password": password,
                       "key" : API_KEY}
 
-            print(params)
-
             # make a POST request to the Rest API
             response = re.post(url=endpoint, data=params)
             response = json.loads(response.text)
@@ -63,7 +53,7 @@ def user_signup():
                 session['logged_in'] = True
                 session['email'] = email
                 # save first name in  session storage with first letter capitalized
-                session['first_name'] = f_name.title()
+                session['admin_first_name'] = f_name.title()
                 # redirect to dashboard
                 session.pop('admin_logged_in', None)
 
@@ -85,15 +75,15 @@ def user_signup():
     return render_template("signup.html", error=error)
 
 
-@app.route('/login', methods=["GET", "POST"])
-def login():
+@app.route('/sign_in', methods=["GET", "POST"])
+def sign_in():
     error = None
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
 
         # Rest API endpoint
-        endpoint = API_ENDPOINT + "login"
+        endpoint = API_ENDPOINT + "sign_in"
 
         params = {"email": email,
                   "password": password}
@@ -124,7 +114,7 @@ def login():
         if session['logged_in']:
             return redirect(url_for("home"))
 
-    return render_template("login.html", error=error)
+    return render_template("signin.html", error=error)
 
 
 @app.route('/signout')
@@ -132,7 +122,7 @@ def signout():
     session.pop('logged_in', None)
     session.pop('email', None)
     session.pop('first_name', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('sign_in'))
 
 
 @app.route('/admin_signup', methods=["GET", "POST"])
@@ -162,10 +152,10 @@ def admin_signup():
             # if API call succeeds
             if response['result'] == "success":
                 # save variables in session storage
-                session['logged_in'] = True
+                session['admin_logged_in'] = True
                 session['email'] = email
                 # save first name in  session storage with first letter capitalized
-                session['first_name'] = f_name.title()
+                session['admin_first_name'] = f_name.title()
                 # redirect to dashboard
                 session.pop('logged_in', None)
 
@@ -210,7 +200,7 @@ def admin_signin():
             # save email in session storage
             session['email'] = email
             # save first name in  session storage with first letter capitalized
-            session['first_name'] = response['first_name'].title()
+            session['admin_first_name'] = response['first_name'].title()
     
             session['admin_logged_in'] = True
             # redirect to dashboard
@@ -232,7 +222,6 @@ def admin_dashboard():
     data['msg'] = None
 
     if "admin_logged_in" in session:
-        print("admin in session")
         if session['admin_logged_in']:
             data['email'] = session['email']
             data['first_name'] = session['first_name']
@@ -465,7 +454,6 @@ def show_item(id):
 
             endpoint = API_ENDPOINT + "add_to_cart"
             response = re.post(url=endpoint, data=params)
-            print(response.text)
             response = json.loads(response.text)
 
             if response["result"] == "success":
@@ -488,6 +476,7 @@ def show_item(id):
         data['item'] = response['item']
         return render_template('item.html', data=data)
 
+    # implement error page
     return "<html>Item not found</html>"
 
 
@@ -514,7 +503,7 @@ def cart():
             data['msg'] = "Error viewing cart"
         
     else:
-        data['msg'] = "Log in to see your cart"
+        data['msg'] = "Sign in to see your cart"
 
     return render_template('cart.html', data=data)
 
@@ -538,7 +527,7 @@ def account():
                 data['first_name'] = response['first_name']
                 data['last_name'] = response['last_name']
     else:
-        data['msg'] = "Log in to see your account details"
+        data['msg'] = "Sign in to see your account details"
 
     return render_template('account.html', data=data)
 
@@ -588,7 +577,6 @@ def change_name():
         else:
             data['msg'] = "Error changing name."
 
-        print(data['msg'])
         return redirect(url_for('account'))
 
 
@@ -613,7 +601,6 @@ def change_password():
         else:
             data['msg'] = "Error changing password."
 
-        print(data['msg'])
         return redirect(url_for('account'))
 
 
@@ -686,7 +673,6 @@ def change_admin_name():
         else:
             data['msg'] = "Error changing name."
 
-        print(data['msg'])
         return redirect(url_for('admin_account'))
         
 
@@ -711,12 +697,92 @@ def change_admin_password():
         else:
             data['msg'] = "Error changing password."
 
-        print(data['msg'])
         return redirect(url_for('admin_account'))
 
 
+@app.route('/checkout', methods=["POST", "GET"])
+def checkout():
+    data = {'msg': None,
+            'cart_data' : None}
 
+    if 'logged_in' in session and 'email' in session:
+        email = session['email']
 
+        # get cart items
+        params = {"email" : email,
+                  "key" : API_KEY}
+
+        endpoint = API_ENDPOINT + "cart"
+        response = re.post(url=endpoint, data=params)
+        response = json.loads(response.text)
+
+        if response['result'] == "success":
+            # calculate order total
+            cart_total = 0.0
+
+            for item in response['cart']:
+                cart_total = cart_total + (item['price'] * item['quantity'])
+
+            data['cart_data'] = {}
+            data['cart_data']['cart'] = response['cart']
+            data['cart_data']['cart_total'] = cart_total
+
+            empty_fields = False
+
+            # check for empty fields only, apt_no(address line 2) can be empty
+            if request.method == "POST":
+                for key, value in request.form.items():
+                    if len(value) == 0 and key != 'apt_no':
+                        data['msg'] = "Only Apt no can be empty!"
+                        empty_fields = True
+
+                if not empty_fields:
+                    # name on the address
+                    name = request.form['name']
+                    # contact for the order
+                    phone = request.form['phone']
+
+                    address = {}
+                    # address line 1
+                    address["street"] = request.form['street']
+                    # address line 2
+                    address["apt_no"] = request.form['apt_no']
+                    # city
+                    address["city"] = request.form['city']
+                    # state
+                    address["state"] = request.form['state']
+                    # zip code
+                    address["zip_code"] = request.form['zip_code']
+                    # country
+                    address['country'] = request.form['country']
+
+                    params = {"email" : email,
+                            "name" : name,
+                            "phone" : phone,
+                            "address" : address,
+                            "total_amount" : data['cart_data']['cart_total'],
+                            "key" : API_KEY}
+
+                    endpoint = API_ENDPOINT + "checkout"
+                    response = re.post(url=endpoint, json=params)
+
+                    try:
+                        response = response.json()
+                        if response['result'] == "success":
+                            data['msg'] = "Order successful!"
+                            data['cart_data'] = None
+                        else:
+                            data['msg'] = "Your order could not be placed."
+                    except:
+                        data['msg'] = "Your order could not be placed."
+
+        elif response['result'] == "empty":
+            data['msg'] = "Your cart is empty."
+
+        return render_template('checkout.html', data=data)
+
+    # if user is not signed in
+    return redirect(url_for(sign_in))
 
 # helper functions
 def allowed_file(filename):

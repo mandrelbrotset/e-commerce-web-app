@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+    {% if data['cart_data'] %}
+        <h2>Checkout</h2>
+
+        <form method="POST">
+            <h3>Deliver to</h3>
+            Name <input type="text" name="name">
+            Street <input type="text" name="street">
+            Apt no <input type="text" name="apt_no">
+            city <input type="text" name="city">
+            State <input type="text" name="state">
+            Zip code <input type="text" name="zip_code">
+            Country <input type="text" name="country">
+            <!-- -->
+            Phone <input type="text" name="phone">
+
+            <table>
+                {% for item in data['cart_data']['cart'] %}
+                <tr>
+                    <a href="{{ url_for('show_item', id=item['item_id']) }}">
+                        <td><img src="{{ url_for('static', filename='images/' + item['image_url']) }}" height="100px"></td>
+                        <td>{{ item['name'] }}</td>
+                        <td>{{ item['quantity'] }}</td>
+                        <td>${{ item['quantity'] * item['price'] }}</td>
+                    </a>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>Cart total</td>
+                    <td>${{ data['cart_data']['cart_total'] }}</td>
+                </tr>
+            </table>
+
+            <input type="submit" value="Place order" class="btn btn-primary form-btn">
+        </form>
+    {% endif %}
+
+    {% if data['msg'] %}
+        <br>
+        <div class="alert alert-info" role="alert">
+            {{ data['msg'] }}
+        </div>
+    {% endif %}
+
+{% endblock %}
