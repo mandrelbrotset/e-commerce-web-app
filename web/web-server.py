@@ -224,7 +224,7 @@ def admin_dashboard():
     if "admin_logged_in" in session:
         if session['admin_logged_in']:
             data['email'] = session['email']
-            data['first_name'] = session['first_name']
+            data['first_name'] = session['admin_first_name']
 
             if request.method == "POST":
                 name = request.form["name"]
@@ -268,7 +268,7 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', data=data)
 
 
-@app.route('/add_item')
+@app.route('/add_item', methods=["POST"])
 def add_item():
     data = {}
     data['msg_type'] = None

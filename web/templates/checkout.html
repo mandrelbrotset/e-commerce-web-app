@@ -1,49 +1,217 @@
 {% extends "base.html" %}
 {% block content %}
+    <style>
+        /* ------- Style for checkout page -------- */
+        .checkout-ctn {
+            width: 80%;
+            margin: 20px auto;
+        }
 
-    {% if data['cart_data'] %}
-        <h2>Checkout</h2>
+        .checkout-ctn h2 {
+                text-align: center;
+                padding: 15px;
+        }
 
-        <form method="POST">
-            <h3>Deliver to</h3>
-            Name <input type="text" name="name">
-            Street <input type="text" name="street">
-            Apt no <input type="text" name="apt_no">
-            city <input type="text" name="city">
-            State <input type="text" name="state">
-            Zip code <input type="text" name="zip_code">
-            Country <input type="text" name="country">
-            <!-- -->
-            Phone <input type="text" name="phone">
+        .order-btn {
+                margin: 10px 0 10px 90%;
+                width: 10%;
+        }
 
-            <table>
+        .form-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .user-address {
+            width: 50%;
+            float: left;
+        }
+
+        .h5-header {
+            margin-top: 5px;
+        }
+
+        input {
+            padding: 0px 4px;
+            border: 1px #d4d4d4 solid;
+        }
+
+        .ig {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .cart-item {
+            height: 160px;
+            width: 48%;
+            float: left;
+            margin: 5px 0.5%;
+            background-color: #E3E3E6;
+            overflow: auto;
+            overflow-wrap: break-word;
+        }
+
+        .cart-item img {
+            float: left;
+            height: 160px;
+        }
+
+        .cart-item ul {
+            float: left;
+            margin: 15px 2px;
+        }
+
+        .cart-item li {
+            padding: 5px;
+        }
+
+        .total_cost {
+            width: 20%;
+            margin-left: 80%;
+        }
+        /* ------- End style for checkout page ------- */
+    </style>
+
+    <div class="checkout-ctn">
+            {% if data['cart_data'] %}
+            <h2>Checkout</h2>
+    
+            <form method="POST">
+                <div class="user-address">
+                    <h5>Billing address</h5>
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Name</span>
+                        </div>
+                        <input type="text" name="name" style="width:490px">
+                    </div>
+    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Street</span>
+                        </div>
+                        <input type="text" name="street" style="width:280px;">
+    
+                        <div class="input-group-prepend" style="margin-left:20px">
+                            <span class="input-group-text" id="">Apt no</span>
+                        </div>
+                        <input type="text" name="apt_no" style="width:120px;">
+                    </div>
+                    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">City</span>
+                        </div>
+                        <input type="text" name="city" style="width:235px;">
+    
+                        <div class="input-group-prepend" style="margin-left:20px">
+                            <span class="input-group-text" id="">State</span>
+                        </div>
+                        <input type="text" name="state" style="width:190px;">
+                    </div>
+
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Zip Code</span>
+                        </div>
+                        <input type="text" name="zip_code" style="width:150px;">
+
+                        <div class="input-group-prepend" style="margin-left:20px">
+                            <span class="input-group-text" id="">Country</span>
+                        </div>
+                        <input type="text" name="country" style="width:217px;">
+                    </div>
+                </div>
+
+                <div class="user-address">
+                    <h5>Shipping address</h5>
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Name</span>
+                        </div>
+                        <input type="text" name="name" style="width:490px">
+                    </div>
+
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Street</span>
+                        </div>
+                        <input type="text" name="street" style="width:280px;">
+
+                        <div class="input-group-prepend" style="margin-left:20px">
+                            <span class="input-group-text" id="">Apt no</span>
+                        </div>
+                        <input type="text" name="apt_no" style="width:120px;">
+                    </div>
+                    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">City</span>
+                        </div>
+                        <input type="text" name="city" style="width:235px;">
+
+                        <div class="input-group-prepend" style="margin-left:20px">
+                            <span class="input-group-text" id="">State</span>
+                        </div>
+                        <input type="text" name="state" style="width:190px;">
+                    </div>
+                    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Zip Code</span>
+                        </div>
+                        <input type="text" name="zip_code" style="width:150px;">
+
+                        <div class="input-group-prepend" style="margin-left: 20px;">
+                            <span class="input-group-text" id="">Country</span>
+                        </div>
+                        <input type="text" name="country" style="width:217px;">
+                    </div>
+                    
+                    <div class="input-group ig">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="">Phone</span>
+                        </div>
+                        <input type="text" name="phone" style="width:230px">
+                    </div>
+                </div>
+    
+                <div style="clear:both;"></div>
+
+                <h5 class="h5-header">Items</h5>
                 {% for item in data['cart_data']['cart'] %}
-                <tr>
-                    <a href="{{ url_for('show_item', id=item['item_id']) }}">
-                        <td><img src="{{ url_for('static', filename='images/' + item['image_url']) }}" height="100px"></td>
-                        <td>{{ item['name'] }}</td>
-                        <td>{{ item['quantity'] }}</td>
-                        <td>${{ item['quantity'] * item['price'] }}</td>
-                    </a>
-                </tr>
+                    <div class="cart-item">
+                        <img src="{{ url_for('static', filename='images/' + item['image_url']) }}">
+                        <ul>
+                            <li><h5>{{ item['name'] }}</h5></li>
+                            <li>Quantity: {{ item['quantity'] }}</li>
+                            <li>Price: ${{ item['quantity'] * item['price'] }}</li>
+                        </ul>
+                    </div>
                 {% endfor %}
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>Cart total</td>
-                    <td>${{ data['cart_data']['cart_total'] }}</td>
-                </tr>
-            </table>
+                <div style="clear:both;"></div>
 
-            <input type="submit" value="Place order" class="btn btn-primary form-btn">
-        </form>
-    {% endif %}
+                <h5 class="h5-header">Cart total</h5>                
+                <hr>
+                <div class="total_cost">
+                    
+                    <p>Item total: ${{ data['cart_data']['cart_total'] }}</p>
+                    <p>Shipping: $0</p>
+                    <hr>
+                    <p>Total price: ${{ data['cart_data']['cart_total'] }}</p>
+                </div>
 
-    {% if data['msg'] %}
-        <br>
-        <div class="alert alert-info" role="alert">
-            {{ data['msg'] }}
-        </div>
-    {% endif %}
-
+                <hr>
+                <input type="submit" value="Place order" class="btn btn-primary order-btn">
+            </form>
+        {% endif %}
+    
+        {% if data['msg'] %}
+            <br>
+            <div class="alert alert-info" role="alert">
+                {{ data['msg'] }}
+            </div>
+        {% endif %}    
+    </div>
+    
 {% endblock %}

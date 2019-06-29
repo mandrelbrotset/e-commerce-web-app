@@ -22,20 +22,16 @@
                 class="list-group-item list-group-item-action flex-column align-items-start">
                 <img src="{{ url_for('static', filename='images/' + item['image_url']) }}" style="height:200px;" />
                 <div class="side-content">
-                    <div class="d-flex justify-content-between">
-                        <h4>{{ item['name'] }}</h4>
-                        <h4>Quantity: {{ item['quantity'] }}</h4>
-                        <h4>Price: ${{ item['quantity'] * item['price']}}</h4>
-                    </div>
-                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius
-                        blandit.</p>
-                    <small>Donec id elit non mi porta.</small>
+                    <ul>
+                        <li><h4>{{ item['name'] }}</h4></li>
+                        <li>Quantity: {{ item['quantity'] }}</li>
+                        <li>Price: ${{ item['quantity'] * item['price']}}</li>
+                    </ul>
                 </div>
             </a>
             {% endfor %}
 
             <a href="/checkout" class="btn btn-primary checkout-btn">Checkout</a>
-
         {% endif %}
         
         <style>
