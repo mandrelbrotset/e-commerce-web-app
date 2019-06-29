@@ -268,7 +268,7 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', data=data)
 
 
-@app.route('/add_item', methods=["POST"])
+@app.route('/add_item', methods=["POST", "GET"])
 def add_item():
     data = {}
     data['msg_type'] = None
@@ -662,7 +662,7 @@ def change_admin_name():
 
         # change first name stored in session
         if len(first_name):
-            session['first_name'] = first_name
+            session['admin_first_name'] = first_name
 
         endpoint = API_ENDPOINT + "change_admin_name"
         response = re.post(url=endpoint, data=params)
@@ -791,4 +791,4 @@ def allowed_file(filename):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
