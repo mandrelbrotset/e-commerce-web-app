@@ -229,10 +229,11 @@ def get_items():
                 items = db.get_items()
                 products = []
 
-                for item in items:
-                    products.append({"id":item[0], "name":item[1], "quantity":item[2],
-                                     "tags":item[3], "description":item[4], 
-                                     "price":float(item[5]), "image_url":item[6]})
+                if items:
+                    for item in items:
+                        products.append({"id":item[0], "name":item[1], "quantity":item[2],
+                                        "tags":item[3], "description":item[4], 
+                                        "price":float(item[5]), "image_url":item[6]})
 
                 ret = {"result" : "success",
                        "items" : products}
