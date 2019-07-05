@@ -21,11 +21,16 @@
             <br>
             <input type="submit" value="Login as admin" class="btn btn-primary form-btn">
             <br><br>
-            {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endif %}
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
         </form>
         <p>Don't have an account, <a href="/admin_signup">create an admin</a> account</p>

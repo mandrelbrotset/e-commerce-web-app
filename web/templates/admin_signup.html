@@ -37,13 +37,16 @@
             <input type="submit" value="Create admin account" class="btn btn-primary form-btn">
             <br><br>
     
-            {% if error %}
-                {% for err in error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ err }}
-                </div>
-                {% endfor %}
-            {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
         </form>
         <p>Have an account, <a href="/admin">login</a> instead</p>
  

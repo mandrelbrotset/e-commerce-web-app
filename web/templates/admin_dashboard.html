@@ -14,7 +14,16 @@
             padding-top: 15px;
         }
 
-        .item-listing {
+        /* ------- style for add-item  -------- */
+        #add-item {
+        width: 50%;
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        }
+
+        /* ------- style for edit-item  -------- */
+        #item-listing {
             margin-top: 20px;
         }
 
@@ -28,20 +37,260 @@
             box-shadow: 0px;
             -moz-window-shadow: 0px;
         }
+        /* -------   -------- */
 
     </style>
 
+
     <div class="dashboard">
-        <a href="/add_item" class="btn">Add Item to Stock</a>
-        <a href="/edit_item" class="btn">Edit Item in Stock</a>
+        <button onclick="showAddItemPage()" class="btn">Add Item</button>
+        <button onclick="showEditPage()" class="btn">Edit Item</button>
+        <button onclick="showListings()" class="btn">Item Listings</button>
+        <button onclick="showOrders()" class="btn">Orders</button>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <br><br>
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert" id="message">
+                        {{ message }}
+                        <button onclick="hide_message()">x</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
 
-    <div class="item-listing">
-        <h3>Items in Stock</h3>
-        <div id="product">
-            <img src="{{ url_for('static', filename='images/loading.gif') }}" id="loading">
-        </div>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/load_products.js') }}"></script>
+    <div id="add-item">
+        <h3>Add Item</h3>
+    
+        <form method="POST" enctype="multipart/form-data" action="/add_item">
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Item name</span>
+                </div>
+                <input type="text" name="name" style="width:658px;">
+            </div>
+    
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Price $</span>
+                </div>
+                <input type="text" name="price" style="width:275px;" step="0.01">
+    
+                <div class="input-group-prepend" style="margin-left:52px;">
+                        <span class="input-group-text" id="">Quantity</span>
+                </div>
+                <input type="number" name="quantity" style="width:275px;">
+            </div>
+    
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Description</span>
+                </div>
+                <input type="text" name="description" style="width:654px;">
+            </div>
+    
+            <div class="input-group ig">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Tags</span>
+                </div>
+                <input type="text" name="tags" style="width:702px;" 
+                    placeholder="Enter multiple tags separated by comma">
+            </div>
+    
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Upload</span>
+                </div>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="inputGroupFile02" name="image" />
+                    <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
+                </div>    
+            </div>
+    
+            <input type="submit" value="Add to stock" class="btn btn-primary add-item-btn">
+        </form>
     </div>
+
+    <div id="edit-item">
+        <h3>Edit Item</h3>
+    
+        {% if data['products'] %}
+            <div class='list-group cart-group'>
+            {% if data['products']|length > 0  %}
+                {% for product in data['products'] %}
+                    <div class="list-group-item list-group-item-action flex-column align-items-start" id="{{ product['id'] }}">
+                        <img src="{{ url_for('static', filename="images/" + product['image_url']) }}" style="width:320px;height:250px;" />
+                        <p>
+                            Name: <input type="text" name="name" value="{{ product['name'] }}" id="name-{{ product['id'] }}"/>
+                        </p>
+                        <p>
+                            Price: $<input type="price" step="0.01" name="price" value="{{ product['price'] }}" id="price-{{ product['id'] }}"/>
+                        </p>
+                        <p>
+                            Quantity: <input type="number" name="quantity" value="{{ product['quantity'] }}" id="quantity-{{ product['id'] }}"/>
+                        </p>
+                        <p>
+                            Description: <input type="text" name="description" value="{{ product['description'] }}" id="description-{{ product['id'] }}"/>
+                        </p>
+                        <p>
+                            Tags: <input type="text" name="tags" value="{{ product['tags'] }}" id="tags-{{ product['id'] }}"/>
+                        </p>
+                        <p>
+                            Upload image: <input type="file" name="image" id="file-{{ product['id'] }}"/>
+                        </p>
+
+                        <button name="button" onclick="save('{{ product['id'] }}')" class="btn btn-primary">Save</button>
+    
+                        <form action="/delete_item" method="POST">
+                            <input type="hidden" name="item_id" value="{{ product['id'] }}" />
+                            <button class="btn btn-danger btn-sm" type=submit>
+                                <span class="glyphicon glyphicon-trash"></span> Delete item
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h4>There are no items in stock!</h4>
+            {% endif %}
+            </div>
+        {% endif %}    
+    </div>
+
+    <div id="item-listing">
+        <h3>Items In Stock</h3>
+        <div id="product">
+            {% if data['products'] %}
+                <div class='list-group cart-group'>
+                {% if data['products']|length > 0  %}
+                    {% for product in data['products'] %}
+                        <a href="item/{{ product['id'] }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <img src="static/images/{{ product['image_url'] }}" style="width:320px;height:250px;" />
+                            <div class="side-content">
+                                <div class="d-inline-flex p-3">
+                                <div class="p-2" style="width:700px;"><h4>{{ product['name'] }}</h4></div>
+                                <div class="p-2"><h4>${{ product['price'] }}</h4></div>
+                                </div>
+                                <p class="card-text">{{ product['description'] }}</p>
+                                <small>{{ product['tags'] }}</small>
+                            </div>
+                        </a>   
+                    {% endfor %}
+                {% else %}
+                    <h4>There are no items in stock!</h4>
+                {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="orders">
+        <h3>Current Orders</h3>
+    </div>
+
+    <script>
+        // for edit item
+        function save(item_id){
+            let xhr = new XMLHttpRequest();
+            let formData = new FormData();
+
+            let name = document.getElementById("name-" + item_id).value;
+            let price = document.getElementById("price-" + item_id).value;
+            let quantity = document.getElementById("quantity-" + item_id).value;
+            let description = document.getElementById("description-" + item_id).value;
+            let tags = document.getElementById("tags-" + item_id).value;
+            let file = document.getElementById("file-" + item_id);
+
+            if(file.getAttribute("type") === "file"){
+                file = file.files[0];
+                console.log(file);
+            }
+
+            formData.append("item_id", item_id);
+            formData.append("name", name)
+            formData.append("price", price);
+            formData.append("quantity", quantity);
+            formData.append("description", description);
+            formData.append("tags", tags);
+            formData.append("image", file);
+            
+            xhr.onreadystatechange = state => { 
+                console.log(xhr.status); 
+                // 
+                sessionStorage.setItem("page", "edit_item");
+                // reload page
+                //window.location.reload(true);
+            }
+            let apiURL = "http://localhost:5004/edit_item";
+            xhr.open("POST", apiURL);
+            xhr.send(formData);
+        }
+
+        // orders page
+        function orders(){
+
+
+
+            sessionStorage.setItem("page", "orders");
+        }
+        // end
+
+        // to close alert boxes
+        function hide_message(this) {
+            var x = document.getElementById("message");
+            x = x.parentNode;
+
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        // end
+
+        function showAddItemPage(){
+            document.getElementById('add-item').style.display = "block";
+            document.getElementById('edit-item').style.display = "none";
+            document.getElementById('item-listing').style.display = "none";
+            document.getElementById('orders').style.display = "none";
+        }
+
+        function showEditPage(){
+            document.getElementById('add-item').style.display = "none";
+            document.getElementById('edit-item').style.display = "block";
+            document.getElementById('item-listing').style.display = "none";
+            document.getElementById('orders').style.display = "none";
+        }
+
+        function showListings(){
+            document.getElementById('add-item').style.display = "none";
+            document.getElementById('edit-item').style.display = "none";
+            document.getElementById('item-listing').style.display = "block";
+            document.getElementById('orders').style.display = "none";
+        }
+
+        function showOrders(){
+            document.getElementById('add-item').style.display = "none";
+            document.getElementById('edit-item').style.display = "none";
+            document.getElementById('item-listing').style.display = "none";
+            document.getElementById('orders').style.display = "block";
+        }
+
+        if(sessionStorage.getItem("page")){
+            page = sessionStorage.getItem("page");
+
+            if(page === "edit_item"){
+                showEditPage();
+            }else if(page === "orders"){
+                showOrders();
+            }
+        }else{
+            showListings();
+        }
+
+    </script>
+
     
 {% endblock %}

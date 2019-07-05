@@ -23,6 +23,8 @@ def home():
     
 @app.route('/signup', methods=["GET", "POST"])
 def user_signup():
+    error = []
+
     if request.method == "POST":
         # get data from html form
         f_name = request.form["first_name"]
@@ -30,7 +32,7 @@ def user_signup():
         email = request.form["email"]
         password = request.form["password"]
 
-        if len(f_name) > 0 and len(l_name) > 0 and len(email) > 0 and len(password) > 8:
+        if len(f_name) > 0 and len(l_name) > 0 and len(email) > 0 and len(password) > 6:
             # Rest API endpoint
             endpoint = API_ENDPOINT + "signup"
 
@@ -51,24 +53,21 @@ def user_signup():
                 session['logged_in'] = True
                 session['email'] = email
                 # save first name in  session storage with first letter capitalized
-                session['admin_first_name'] = f_name.title()
+                session['first_name'] = f_name.title()
                 # redirect to dashboard
-                session.pop('admin_logged_in', None)
-
                 return redirect(url_for("home"))
             else:
                 error = [response['result']]
 
         else:
-            error = []
             if len(f_name) <= 0:
                 error.append("You must enter a first name")
             if len(l_name) <= 0:
                 error.append("You must enter a last name")
             if len(email) <= 0:
                 error.append("You must enter an email")
-            if len(password) < 8:
-                error.append("Password must length requirements")
+            if len(password) < 6:
+                error.append("Password must meet length requirements")
             
     return render_template("signup.html", error=error)
 
