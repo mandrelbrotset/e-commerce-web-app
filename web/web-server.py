@@ -166,7 +166,6 @@ def show_item(id):
         else:
             data['msg'] = "Sign in first"
 
-
     params = {"item_id" : id,
               "key" : API_KEY}
 
@@ -308,8 +307,7 @@ def change_password():
 
 @app.route('/checkout', methods=["POST", "GET"])
 def checkout():
-    data = {'msg': None,
-            'cart_data' : None}
+    data = {'cart_data' : None}
 
     if 'logged_in' in session and 'email' in session:
         email = session['email']
@@ -333,16 +331,17 @@ def checkout():
             data['cart_data']['cart'] = response['cart']
             data['cart_data']['cart_total'] = cart_total
 
-            empty_fields = False
-
-            # check for empty fields only, apt_no(address line 2) can be empty
             if request.method == "POST":
+                empty_fields = False
+                
+                # check for empty fields only, apt_no(address line 2) can be empty
                 for key, value in request.form.items():
                     if len(value) == 0 and key != 'apt_no':
-                        data['msg'] = "Only Apt no can be empty!"
                         empty_fields = True
 
-                if not empty_fields:
+                if empty_fields:
+                    flash("Only Apt no can be empty!")
+                else:
                     # name on the address
                     name = request.form['name']
                     # contact for the order
@@ -369,21 +368,24 @@ def checkout():
                             "total_amount" : data['cart_data']['cart_total'],
                             "key" : API_KEY}
 
+                    print(params)
+
                     endpoint = API_ENDPOINT + "checkout"
                     response = re.post(url=endpoint, json=params)
 
                     try:
                         response = response.json()
                         if response['result'] == "success":
-                            data['msg'] = "Order successful!"
+                            flash("Order successful!")
                             data['cart_data'] = None
                         else:
-                            data['msg'] = "Your order could not be placed."
+                            flash("Your order could not be placed")
                     except:
-                        data['msg'] = "Your order could not be placed."
+                        flash("Your order could not be placed")
 
-        elif response['result'] == "empty":
-            data['msg'] = "Your cart is empty."
+                
+            elif response['result'] == "empty":
+                flash("Your cart is empty")
 
         return render_template('checkout.html', data=data)
 

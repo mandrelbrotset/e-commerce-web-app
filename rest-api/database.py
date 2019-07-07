@@ -427,3 +427,15 @@ class Database(object):
                 return result
 
         return False
+
+    def mark_as_fulfilled(self, id):
+        if self.connect():
+            query = "UPDATE OrderDetail SET fulfilled=1, fulfillment_date=now() WHERE order_id={}".format(id)
+
+            self.cursor.execute(query)
+            self.connection.commit()
+            self.connection.close()
+
+            return True
+        
+        return False

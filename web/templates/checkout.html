@@ -205,13 +205,18 @@
                 <input type="submit" value="Place order" class="btn btn-primary order-btn">
             </form>
         {% endif %}
-    
-        {% if data['msg'] %}
-            <br>
-            <div class="alert alert-info" role="alert">
-                {{ data['msg'] }}
-            </div>
-        {% endif %}    
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <br><br>
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert" id="message">
+                        {{ message }}
+                        <button onclick="hide_message()">x</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
     
 {% endblock %}

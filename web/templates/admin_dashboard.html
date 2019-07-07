@@ -140,6 +140,7 @@
                         <p>
                             Upload image: <input type="file" name="image" id="file-{{ product['id'] }}"/>
                         </p>
+                        <input type="hidden" name="image-name" value="{{ product['image_url'] }}" id="img-name-{{ product['id'] }}" />
 
                         <button name="button" onclick="saveItem('{{ product['id'] }}')" class="btn btn-primary">Save</button>
     
@@ -187,67 +188,75 @@
 
     <div id="orders">
         <h3>Unfulfilled Orders</h3>
-        {% if orders and orders['unfulfilled_orders'] %}
+        {% if orders %}
             <div class='list-group cart-group'>
-            {% for order in orders['unfulfilled_orders'] %}
-                <div class="list-group-item list-group-item-action flex-column align-items-start">
-                    <div>
-                        <p>order['order']['order_id']</p>
-                        <p>order['order']['name']</p>
-                        <p>order['order']['email']</p>
-                        <p>order['order']['phone']</p>
-                        <p>order['order']['total_amount']</p>
-                        <p>order['order']['date']</p>
-                        <p>order['order']['fulfilled']</p>
+            {% if orders['unfulfilled_orders'] | length > 0 %}
+                {% for order in orders['unfulfilled_orders'] %}
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div>
+                            <p>order['order']['order_id']</p>
+                            <p>order['order']['name']</p>
+                            <p>order['order']['email']</p>
+                            <p>order['order']['phone']</p>
+                            <p>order['order']['total_amount']</p>
+                            <p>order['order']['date']</p>
+                            <p>order['order']['fulfilled']</p>
 
-                        <input type="checkbox" name="Fulfilled" value="True" checked> 
+                            <input type="checkbox" name="Fulfilled" value="True" checked> 
 
-                        <p>order['order']['fulfillment_date']</p>
+                            <p>order['order']['fulfillment_date']</p>
+                        </div>
+                    
+                        <div>
+                            <p>order['address']['street']</p>
+                            <p>order['address']['apt_no']</p>
+                            <p>order['address']['city']</p>
+                            <p>order['address']['state']</p>
+                            <p>order['address']['zip_code']</p>
+                            <p>order['address']['country']</p>
+                        </div>
+
+                        <button onclick="saveOrder({{ order['order']['order_id'] }})" id="fulfilled-{{ order['order']['order_id'] }}">
+                            Save
+                        </button>
                     </div>
-                
-                    <div>
-                        <p>order['address']['street']</p>
-                        <p>order['address']['apt_no']</p>
-                        <p>order['address']['city']</p>
-                        <p>order['address']['state']</p>
-                        <p>order['address']['zip_code']</p>
-                        <p>order['address']['country']</p>
-                    </div>
-
-                    <button onclick="saveOrder({{ order['order']['order_id'] }})" id="fulfilled-{{ order['order']['order_id'] }}">
-                        Save
-                    </button>
-                </div>
-            {% endfor %}
+                {% endfor %}    
+            {% else %}
+                <p>There are currently no orders to fulfill</p>
+            {% endif %}
             </div>
         {% endif %}
 
         <h3>Fulfilled Orders</h3>
-        {% if orders and orders['fulfilled_orders'] %}
+        {% if orders %}
             <div class='list-group cart-group'>
-            {% for order in orders['fulfilled_orders'] %}
-                <div class="list-group-item list-group-item-action flex-column align-items-start">
-                    <div>
-                        <p>order['order']['order_id']</p>
-                        <p>order['order']['name']</p>
-                        <p>order['order']['email']</p>
-                        <p>order['order']['phone']</p>
-                        <p>order['order']['total_amount']</p>
-                        <p>order['order']['date']</p>
-                        <p>order['order']['fulfilled']</p>
-                        <p>order['order']['fulfillment_date']</p>
+            {% if orders['fulfilled_orders'] | length > 0 %}
+                {% for order in orders['fulfilled_orders'] %}
+                    <div class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div>
+                            <p>order['order']['order_id']</p>
+                            <p>order['order']['name']</p>
+                            <p>order['order']['email']</p>
+                            <p>order['order']['phone']</p>
+                            <p>order['order']['total_amount']</p>
+                            <p>order['order']['date']</p>
+                            <p>order['order']['fulfilled']</p>
+                            <p>order['order']['fulfillment_date']</p>
+                        </div>
+                        
+                        <div>
+                            <p>order['address']['street']</p>
+                            <p>order['address']['apt_no']</p>
+                            <p>order['address']['city']</p>
+                            <p>order['address']['state']</p>
+                            <p>order['address']['zip_code']</p>
+                            <p>order['address']['country']</p>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <p>order['address']['street']</p>
-                        <p>order['address']['apt_no']</p>
-                        <p>order['address']['city']</p>
-                        <p>order['address']['state']</p>
-                        <p>order['address']['zip_code']</p>
-                        <p>order['address']['country']</p>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <p>There are currently no orders to fulfill</p>
+            {% endif %}
             </div>
         {% endif %}
     </div>
@@ -264,10 +273,10 @@
             let description = document.getElementById("description-" + item_id).value;
             let tags = document.getElementById("tags-" + item_id).value;
             let file = document.getElementById("file-" + item_id);
-
-            if(file.getAttribute("type") === "file"){
-                file = file.files[0];
-                console.log(file);
+            let image_name = document.getElementById("img-name-" + item_id).value;
+            
+            if(file.files[0]){
+                formData.append("image", file.files[0]);
             }
 
             formData.append("item_id", item_id);
@@ -276,16 +285,16 @@
             formData.append("quantity", quantity);
             formData.append("description", description);
             formData.append("tags", tags);
-            formData.append("image", file);
+            formData.append("image_name", image_name);
             
             xhr.onreadystatechange = state => { 
                 console.log(xhr.status); 
-                // 
+                // return to Edit Item section after reloading the page
                 sessionStorage.setItem("page", "edit_item");
                 // reload page
-                //window.location.reload(true);
+                window.location.reload(true);
             }
-            let apiURL = "http://localhost:5004/edit_item";
+            let apiURL = "/edit_item";
             xhr.open("POST", apiURL);
             xhr.send(formData);
         }
@@ -299,13 +308,14 @@
                 let formData = new FormData();
 
                 xhr.onreadystatechange = state => { 
-                console.log(xhr.status); 
-                // 
-                sessionStorage.setItem("page", "edit_item");
-                // reload page
-                //window.location.reload(true);
-            
-                let apiURL = "http://localhost:5004/edit_item";
+                    console.log(xhr.status); 
+                    // return to Orders section after reloading the page
+                    sessionStorage.setItem("page", "edit_item");
+                    // reload page
+                    window.location.reload(true);
+                }
+                
+                let apiURL = "/fulfill_order";
                 xhr.open("POST", apiURL);
                 xhr.send(formData);
             }

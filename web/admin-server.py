@@ -109,18 +109,6 @@ def admin_signin():
 def admin_dashboard():
     if "admin_logged_in" in session:
         if session['admin_logged_in']:
-            if request.method == "POST":
-                # save fulfilled order
-                order_id = request.form["order_id"]
-
-                params = {"key" : API_KEY,
-                          "order_id" : order_id}
-                endpoint = API_ENDPOINT + "fulfill_order"
-                response = re.post(url=endpoint, data=params)
-
-                # tell admin that the order has been fulfilled
-                
-
             data = {}
             data['email'] = session['email']
             data['first_name'] = session['admin_first_name']
@@ -154,36 +142,9 @@ def admin_dashboard():
         return redirect(url_for("admin_signin"))
 
 
-@app.route('/item/<int:id>', methods=["GET", "POST"])
+@app.route('/item/<int:id>')
 def show_item(id):
     data = {'item': None}
-
-    if request.method == "POST":
-        item_id = request.form["item_id"]
-        price_per_item = request.form["price"]
-        quantity = request.form["quantity"]
-
-        if 'email' in session:
-            email = session['email']
-            
-            params = {"email" : email,
-                      "quantity" : quantity,
-                      "price_per_item" : price_per_item,
-                      "item_id" : item_id,
-                      "key" : API_KEY}
-
-            endpoint = API_ENDPOINT + "add_to_cart"
-            response = re.post(url=endpoint, data=params)
-            response = json.loads(response.text)
-
-            if response["result"] == "success":
-                flash("Item added to cart")
-            else:
-                flash("Error adding item to cart")
-
-        else:
-            flash("Sign in first")
-
 
     params = {"item_id" : id,
               "key" : API_KEY}
@@ -200,79 +161,54 @@ def show_item(id):
     return "<html>Item not found</html>"
 
 
+@app.route('/fulfill_order', methods=["POST"])
+def fulfill_order():
+    if "admin_logged_in" in session and session['admin_logged_in']:
+        if request.method == "POST":
+            # save fulfilled order
+            order_id = request.form["order_id"]
+
+            params = {"key" : API_KEY,
+                        "order_id" : order_id}
+            endpoint = API_ENDPOINT + "fulfill_order"
+            response = re.post(url=endpoint, data=params)
+            response = response.json()
+
+            # show the success or failure message
+            if response["result"] == "success":
+                flash("Marked order as fulfilled!")
+            else:
+                flash("Error marking order as fulfilled")
+
+            redirect(url_for("admin_dashboard"))
+
+    return redirect(url_for('admin_signin'))
 
 @app.route('/add_item', methods=["POST"])
 def add_item():
-    if "admin_logged_in" in session:
-        if session['admin_logged_in']:
-            if request.method == "POST":
-                name = request.form["name"]
-                quantity = request.form["quantity"]
-                tags = request.form["tags"]
-                description = request.form["description"]
-                price = request.form["price"]
-                
-                error_flag = False
+    if "admin_logged_in" in session and session['admin_logged_in']:
+        if request.method == "POST":
+            name = request.form["name"]
+            quantity = request.form["quantity"]
+            tags = request.form["tags"]
+            description = request.form["description"]
+            price = request.form["price"]
+            
+            error_flag = False
 
-                # save image
-                image_url = ""
-                image_url = save_image(request.files, 'image')
-                if not image_url:
-                    error_flag = True
-                    flash("Upload an image")
+            # save image
+            image_url = ""
+            image_url = save_image(request.files, 'image')
+            if not image_url:
+                error_flag = True
+                flash("Upload an image")
 
-                if len(name) < 1 or len(quantity) < 1 or len(description) < 1 or len(price) < 1:
-                    flash("Only tags can be empty")
-                    error_flag = True
-                
-                if not error_flag:
-                    params = {"name" : name,
-                            "quantity" : quantity,
-                            "tags" : tags,
-                            "description" : description,
-                            "price" : price,
-                            "image_url" : image_url,
-                            "key" : API_KEY}
-
-                    endpoint = API_ENDPOINT + "add_item"
-                    response = re.post(url=endpoint, data=params)
-                    response = json.loads(response.text)
-
-                    if response["result"] == "success":
-                        flash("Item added to stock")
-                    else:
-                        flash("Error adding item to stock")
-
-            return redirect(url_for('admin_dashboard'))
-
-        else:
-            return redirect(url_for('admin_signin'))        
-    else:
-        return redirect(url_for('admin_signin'))
-
-
-# work on this function !!!!
-@app.route('/edit_item', methods=["POST"])
-def edit_item():
-    if "admin_logged_in" in session:
-        if session['admin_logged_in']:
-            if request.method == "POST":
-                item_id = request.form["item_id"]
-                name = request.form["name"]
-                quantity = request.form["quantity"]
-                tags = request.form["tags"]
-                description = request.form["description"]
-                price = request.form["price"]
-
-                print(request.files['image'].filename)
-                
-                # save image
-                image_url = save_image(request.files, 'image')
-                if not image_url:
-                    image_url = ""
-
-                params = {"item_id" : item_id,
-                        "name" : name,
+            if len(name) < 1 or len(quantity) < 1 or len(description) < 1 or len(price) < 1:
+                flash("Only tags can be empty")
+                error_flag = True
+            
+            if not error_flag:
+                params = {"name" : name,
                         "quantity" : quantity,
                         "tags" : tags,
                         "description" : description,
@@ -280,20 +216,67 @@ def edit_item():
                         "image_url" : image_url,
                         "key" : API_KEY}
 
-                print(params)
-                endpoint = API_ENDPOINT + "edit_item"
+                endpoint = API_ENDPOINT + "add_item"
                 response = re.post(url=endpoint, data=params)
+                response = json.loads(response.text)
 
-                if response.status_code == 200:
-                    response = response.json()
-
-                    if response['result'] == "success":
-                        flash("Saved!")
+                if response["result"] == "success":
+                    flash("Item added to stock")
                 else:
-                    flash("Server error")
-                    
-                return redirect(url_for('admin_dashboard'))
+                    flash("Error adding item to stock")
+
+        return redirect(url_for('admin_dashboard'))
+
+    else:
+        return redirect(url_for('admin_signin'))
+
+
+# work on this function !!!!
+@app.route('/edit_item', methods=["POST"])
+def edit_item():
+    if "admin_logged_in" in session and session['admin_logged_in']:
+        if request.method == "POST":
+            item_id = request.form["item_id"]
+            name = request.form["name"]
+            quantity = request.form["quantity"]
+            tags = request.form["tags"]
+            description = request.form["description"]
+            price = request.form["price"]
+            image_name = request.form["image_name"]
+
+            # save image if an image is uploaded
+            if 'image' in request.files and request.files['image'].filename != "":
+                image_url = save_image(request.files['image'], 'image')
+
+                if not image_url:
+                    flash("Error selected image is not supported")
+                    return redirect(url_for('admin_dashboard'))
+            else:
+                image_url = image_name
             
+            params = {"item_id" : item_id,
+                    "name" : name,
+                    "quantity" : quantity,
+                    "tags" : tags,
+                    "description" : description,
+                    "price" : price,
+                    "image_url" : image_url,
+                    "key" : API_KEY}
+
+            print(params)
+            endpoint = API_ENDPOINT + "edit_item"
+            response = re.post(url=endpoint, data=params)
+
+            if response.status_code == 200:
+                response = response.json()
+
+                if response['result'] == "success":
+                    flash("Saved!")
+            else:
+                flash("Server error")
+                
+            return redirect(url_for('admin_dashboard'))
+        
     return redirect(url_for('admin_signin'))
 
 
