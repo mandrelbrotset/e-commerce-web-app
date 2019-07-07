@@ -107,26 +107,98 @@ def admin_signin():
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    data = {}
-    data['products'] = None
-
     if "admin_logged_in" in session:
         if session['admin_logged_in']:
+            if request.method == "POST":
+                # save fulfilled order
+                order_id = request.form["order_id"]
+
+                params = {"key" : API_KEY,
+                          "order_id" : order_id}
+                endpoint = API_ENDPOINT + "fulfill_order"
+                response = re.post(url=endpoint, data=params)
+
+                # tell admin that the order has been fulfilled
+                
+
+            data = {}
             data['email'] = session['email']
             data['first_name'] = session['admin_first_name']
 
+            # get items currently in stock
             params = {"key" : API_KEY}
             endpoint = API_ENDPOINT + "get_items"
             response = re.post(url=endpoint, data=params)
-            response = json.loads(response.text)
+            response = response.json()
             
+            data['products'] = None
             if response['result'] == "success":
                 data['products'] = response['items']
 
-            print(data['products'])
-            return render_template('admin_dashboard.html', data=data)
+            # get orders
+            params = {"key" : API_KEY}
+            endpoint = API_ENDPOINT + "orders"
+            response = re.post(url=endpoint, data=params)
+            orders = None
+
+            response = response.json()
+            if response['fulfilled_orders'] != None and response['fulfilled_orders'] != None:
+                orders = {}
+                orders['fulfilled_orders'] = response['fulfilled_orders']
+                orders['unfulfilled_orders'] = response['unfulfilled_orders']
+            else:
+                flash("An error ocurred while retrieving ordered item")
+
+            return render_template('admin_dashboard.html', data=data, orders=orders)
     else:
         return redirect(url_for("admin_signin"))
+
+
+@app.route('/item/<int:id>', methods=["GET", "POST"])
+def show_item(id):
+    data = {'item': None}
+
+    if request.method == "POST":
+        item_id = request.form["item_id"]
+        price_per_item = request.form["price"]
+        quantity = request.form["quantity"]
+
+        if 'email' in session:
+            email = session['email']
+            
+            params = {"email" : email,
+                      "quantity" : quantity,
+                      "price_per_item" : price_per_item,
+                      "item_id" : item_id,
+                      "key" : API_KEY}
+
+            endpoint = API_ENDPOINT + "add_to_cart"
+            response = re.post(url=endpoint, data=params)
+            response = json.loads(response.text)
+
+            if response["result"] == "success":
+                flash("Item added to cart")
+            else:
+                flash("Error adding item to cart")
+
+        else:
+            flash("Sign in first")
+
+
+    params = {"item_id" : id,
+              "key" : API_KEY}
+
+    endpoint = API_ENDPOINT + "item_by_id"
+    response = re.post(url=endpoint, data=params)
+    response = json.loads(response.text)
+
+    if response['result'] == "success":
+        data['item'] = response['item']
+        return render_template('item.html', data=data)
+
+    # implement error page
+    return "<html>Item not found</html>"
+
 
 
 @app.route('/add_item', methods=["POST"])

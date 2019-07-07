@@ -141,7 +141,7 @@
                             Upload image: <input type="file" name="image" id="file-{{ product['id'] }}"/>
                         </p>
 
-                        <button name="button" onclick="save('{{ product['id'] }}')" class="btn btn-primary">Save</button>
+                        <button name="button" onclick="saveItem('{{ product['id'] }}')" class="btn btn-primary">Save</button>
     
                         <form action="/delete_item" method="POST">
                             <input type="hidden" name="item_id" value="{{ product['id'] }}" />
@@ -186,12 +186,75 @@
     </div>
 
     <div id="orders">
-        <h3>Current Orders</h3>
+        <h3>Unfulfilled Orders</h3>
+        {% if orders and orders['unfulfilled_orders'] %}
+            <div class='list-group cart-group'>
+            {% for order in orders['unfulfilled_orders'] %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div>
+                        <p>order['order']['order_id']</p>
+                        <p>order['order']['name']</p>
+                        <p>order['order']['email']</p>
+                        <p>order['order']['phone']</p>
+                        <p>order['order']['total_amount']</p>
+                        <p>order['order']['date']</p>
+                        <p>order['order']['fulfilled']</p>
+
+                        <input type="checkbox" name="Fulfilled" value="True" checked> 
+
+                        <p>order['order']['fulfillment_date']</p>
+                    </div>
+                
+                    <div>
+                        <p>order['address']['street']</p>
+                        <p>order['address']['apt_no']</p>
+                        <p>order['address']['city']</p>
+                        <p>order['address']['state']</p>
+                        <p>order['address']['zip_code']</p>
+                        <p>order['address']['country']</p>
+                    </div>
+
+                    <button onclick="saveOrder({{ order['order']['order_id'] }})" id="fulfilled-{{ order['order']['order_id'] }}">
+                        Save
+                    </button>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+
+        <h3>Fulfilled Orders</h3>
+        {% if orders and orders['fulfilled_orders'] %}
+            <div class='list-group cart-group'>
+            {% for order in orders['fulfilled_orders'] %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div>
+                        <p>order['order']['order_id']</p>
+                        <p>order['order']['name']</p>
+                        <p>order['order']['email']</p>
+                        <p>order['order']['phone']</p>
+                        <p>order['order']['total_amount']</p>
+                        <p>order['order']['date']</p>
+                        <p>order['order']['fulfilled']</p>
+                        <p>order['order']['fulfillment_date']</p>
+                    </div>
+                    
+                    <div>
+                        <p>order['address']['street']</p>
+                        <p>order['address']['apt_no']</p>
+                        <p>order['address']['city']</p>
+                        <p>order['address']['state']</p>
+                        <p>order['address']['zip_code']</p>
+                        <p>order['address']['country']</p>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
     </div>
 
     <script>
         // for edit item
-        function save(item_id){
+        function saveItem(item_id){
             let xhr = new XMLHttpRequest();
             let formData = new FormData();
 
@@ -226,20 +289,32 @@
             xhr.open("POST", apiURL);
             xhr.send(formData);
         }
-
-        // orders page
-        function orders(){
-
-
-
-            sessionStorage.setItem("page", "orders");
-        }
         // end
 
+        function saveOrder(id){
+            let inputField = document.getElementById('fulfilled-' + id)
+
+            if(inputField.value === "True"){
+                let xhr = new XMLHttpRequest();
+                let formData = new FormData();
+
+                xhr.onreadystatechange = state => { 
+                console.log(xhr.status); 
+                // 
+                sessionStorage.setItem("page", "edit_item");
+                // reload page
+                //window.location.reload(true);
+            
+                let apiURL = "http://localhost:5004/edit_item";
+                xhr.open("POST", apiURL);
+                xhr.send(formData);
+            }
+        }
+
+
         // to close alert boxes
-        function hide_message(this) {
-            var x = document.getElementById("message");
-            x = x.parentNode;
+        function hide_message(x) {
+            x = this.parentNode;
 
             if (x.style.display === "none") {
                 x.style.display = "block";

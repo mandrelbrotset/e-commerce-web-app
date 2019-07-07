@@ -545,15 +545,15 @@ def edit_item():
 @app.route('/checkout', methods=["POST"])
 def checkout():
     if request.method == "POST":
-        if 'key' in request.json:
-            key = request.json['key']
+        if 'key' in request.form:
+            key = request.form['key']
 
             if key == API_KEY:
-                name = request.json['name']
-                email = request.json['email']
-                phone = request.json['phone']
-                address = request.json['address']
-                total_amount = request.json['total_amount']
+                name = request.form['name']
+                email = request.form['email']
+                phone = request.form['phone']
+                address = request.form['address']
+                total_amount = request.form['total_amount']
 
                 dt = datetime.datetime.now()
                 # increase randomness by getting 
@@ -569,9 +569,62 @@ def checkout():
                 db.order_items(order_id, email)
 
         return json.dumps({"result" : "success"})
-        #return json.dumps({"result" : "failed"})
 
     return json.dumps({"result" : ERR_5})
+
+
+@app.route('/orders', methods=["POST"])
+def orders():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form['key']
+
+            if key == API_KEY:
+                result = db.get_orders()
+
+                fulfilled_orders = None
+                unfulfilled_orders = None
+
+                if result != None:
+                    fulfilled_orders = []
+                    unfulfilled_orders = []
+
+                    for i in result:
+                        order_details = {'order' : {'order_id':i[0], 'name':i[1], 
+                                                    'email':i[2], 'phone':i[3], 
+                                                    'total_amount':float(i[4]), 
+                                                    'date':i[5], 'fulfilled':bool(i[6]),
+                                                    'fulfillment_date':i[7]},
+                                        'address' : {'street':i[8], 'apt_no':i[9],
+                                                     'city':i[10], 'state':i[11], 
+                                                     'zip_code':i[12], 'country':i[13]}}
+
+                        if bool(i[6]):
+                            fulfilled_orders.append(order_details)
+                        else:
+                            unfulfilled_orders.append(order_details)
+
+                        print(fulfilled_orders)
+                        print(unfulfilled_orders)
+
+                return json.dumps({"fulfilled_orders" : fulfilled_orders,
+                                   "unfulfilled_orders" : unfulfilled_orders})
+        else:
+            return json.dumps(["key error"])
+
+    return json.dumps({"fulfilled_orders" : None,
+                       "unfulfilled_orders" : None})
+
+
+@app.route('/fulfill_order', methods=["POST"])
+def fulfill_order():
+    if request.method == "POST":
+        if 'key' in request.form:
+            key = request.form['key']
+
+            if key == API_KEY:
+                pass
+                #
 
 
 if __name__ == "__main__":

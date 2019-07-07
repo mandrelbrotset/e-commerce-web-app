@@ -50,6 +50,8 @@ CREATE TABLE OrderDetail
   phone VARCHAR(255) NOT NULL,
   total_amount DECIMAL(15, 2) NOT NULL,
   date DATETIME NOT NULL,
+  fulfilled BOOLEAN NOT NULL,
+  fulfillment_date DATETIME NULL,
 
   CONSTRAINT FOREIGN KEY (email) 
     REFERENCES Login(email)

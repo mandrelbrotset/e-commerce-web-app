@@ -5,7 +5,6 @@ from werkzeug.utils import secure_filename
 import json
 import os
 
-
 # Rest API endpoint
 API_ENDPOINT = "http://127.0.0.1:5002/"
 API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
