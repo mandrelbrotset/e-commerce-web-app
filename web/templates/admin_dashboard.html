@@ -194,29 +194,26 @@
                 {% for order in orders['unfulfilled_orders'] %}
                     <div class="list-group-item list-group-item-action flex-column align-items-start">
                         <div>
-                            <p>order['order']['order_id']</p>
-                            <p>order['order']['name']</p>
-                            <p>order['order']['email']</p>
-                            <p>order['order']['phone']</p>
-                            <p>order['order']['total_amount']</p>
-                            <p>order['order']['date']</p>
-                            <p>order['order']['fulfilled']</p>
+                            <p>Customer name: {{ order['order']['name'] }}</p>
+                            <p>Customer email: {{ order['order']['email'] }}</p>
+                            <p>Customer phone: {{ order['order']['phone'] }}</p>
+                            <p>Order total: {{ order['order']['total_amount'] }}</p>
+                            <p>Order date: {{ order['order']['date'] }}</p>
 
-                            <input type="checkbox" name="Fulfilled" value="True" checked> 
-
-                            <p>order['order']['fulfillment_date']</p>
+                            <p>
+                                <input type="checkbox" id="fulfilled-{{ order['order']['order_id'] }}" value="True" 
+                                    {% if order['order']['fulfilled'] == True %} checked {% endif %}> fulfilled
+                            </p> 
                         </div>
                     
                         <div>
-                            <p>order['address']['street']</p>
-                            <p>order['address']['apt_no']</p>
-                            <p>order['address']['city']</p>
-                            <p>order['address']['state']</p>
-                            <p>order['address']['zip_code']</p>
-                            <p>order['address']['country']</p>
+                            <h6>Shipping address</h6>
+                            <p>{{ order['address']['street'] }} {{ order['address']['apt_no'] }}</p>
+                            <p>{{ order['address']['city'] }}, {{ order['address']['state'] }} {{ order['address']['zip_code'] }}</p>
+                            <p>{{ order['address']['country'] }}</p>
                         </div>
 
-                        <button onclick="saveOrder({{ order['order']['order_id'] }})" id="fulfilled-{{ order['order']['order_id'] }}">
+                        <button onclick="saveOrder(this)" id="{{ order['order']['order_id'] }}">
                             Save
                         </button>
                     </div>
@@ -234,23 +231,25 @@
                 {% for order in orders['fulfilled_orders'] %}
                     <div class="list-group-item list-group-item-action flex-column align-items-start">
                         <div>
-                            <p>order['order']['order_id']</p>
-                            <p>order['order']['name']</p>
-                            <p>order['order']['email']</p>
-                            <p>order['order']['phone']</p>
-                            <p>order['order']['total_amount']</p>
-                            <p>order['order']['date']</p>
-                            <p>order['order']['fulfilled']</p>
-                            <p>order['order']['fulfillment_date']</p>
+                            <p>Customer name: {{ order['order']['name'] }}</p>
+                            <p>Customer email: {{ order['order']['email'] }}</p>
+                            <p>Customer phone: {{ order['order']['phone'] }}</p>
+                            <p>Order total: {{ order['order']['total_amount'] }}</p>
+                            <p>Order date: {{ order['order']['date'] }}</p>
+
+                            <p>
+                                <input type="checkbox" name="dulfilled" value="True" 
+                                    {% if order['order']['fulfilled'] == True %} checked {% endif %}> fulfilled
+                            </p> 
+
+                            <p>Fulfilled on: {{ order['order']['fulfillment_date'] }}</p>
                         </div>
                         
                         <div>
-                            <p>order['address']['street']</p>
-                            <p>order['address']['apt_no']</p>
-                            <p>order['address']['city']</p>
-                            <p>order['address']['state']</p>
-                            <p>order['address']['zip_code']</p>
-                            <p>order['address']['country']</p>
+                            <h6>Shipping address</h6>
+                            <p>{{ order['address']['street'] }} {{ order['address']['apt_no'] }}</p>
+                            <p>{{ order['address']['city'] }}, {{ order['address']['state'] }} {{ order['address']['zip_code'] }}</p>
+                            <p>{{ order['address']['country'] }}</p>
                         </div>
                     </div>
                 {% endfor %}
@@ -300,19 +299,23 @@
         }
         // end
 
-        function saveOrder(id){
-            let inputField = document.getElementById('fulfilled-' + id)
+        function saveOrder(obj){
+            let inputField = document.getElementById('fulfilled-' + obj.id)
 
             if(inputField.value === "True"){
                 let xhr = new XMLHttpRequest();
                 let formData = new FormData();
 
+                formData.append("order_id", obj.id);
+                
+                console.log("id: " + obj.id)
+
                 xhr.onreadystatechange = state => { 
                     console.log(xhr.status); 
                     // return to Orders section after reloading the page
-                    sessionStorage.setItem("page", "edit_item");
+                    sessionStorage.setItem("page", "orders");
                     // reload page
-                    window.location.reload(true);
+                    // window.location.reload(true);
                 }
                 
                 let apiURL = "/fulfill_order";

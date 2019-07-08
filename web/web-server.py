@@ -235,20 +235,21 @@ def account():
 
 @app.route('/delete_account')
 def delete_account():
-    if 'logged_in' in session:
-        if session['logged_in']:
-            params = {"email" : session['email'],
-                      "key" : API_KEY}
+    if 'logged_in' in session and session['logged_in']:
+        params = {"email" : session['email'],
+                    "key" : API_KEY}
 
-            endpoint = API_ENDPOINT + "delete_account"
-            response = re.post(url=endpoint, data=params)
-            response = json.loads(response.text)
+        endpoint = API_ENDPOINT + "delete_account"
+        response = re.post(url=endpoint, data=params)
+        response = json.loads(response.text)
 
-            session.pop('logged_in', None)
-            session.pop('email', None)
-            session.pop('first_name', None)
-    
-            return redirect(url_for('home'))
+        session.pop('logged_in', None)
+        session.pop('email', None)
+        session.pop('first_name', None)
+
+        return redirect(url_for('home'))
+
+    return redirect(url_for('sign'))
 
 
 @app.route('/change_name', methods=["POST"])
@@ -309,7 +310,7 @@ def change_password():
 def checkout():
     data = {'cart_data' : None}
 
-    if 'logged_in' in session and 'email' in session:
+    if 'logged_in' in session and session['logged_in'] and 'email' in session:
         email = session['email']
 
         # get cart items
@@ -361,6 +362,8 @@ def checkout():
                     # country
                     address['country'] = request.form['country']
 
+                    address = json.dumps(address)
+
                     params = {"email" : email,
                             "name" : name,
                             "phone" : phone,
@@ -371,7 +374,7 @@ def checkout():
                     print(params)
 
                     endpoint = API_ENDPOINT + "checkout"
-                    response = re.post(url=endpoint, json=params)
+                    response = re.post(url=endpoint, data=params)
 
                     try:
                         response = response.json()
@@ -390,8 +393,31 @@ def checkout():
         return render_template('checkout.html', data=data)
 
     # if user is not signed in
-    return redirect(url_for(sign_in))
+    return redirect(url_for('sign_in'))
 
+
+@app.route('/my_orders')
+def my_orders():
+    orders = {}
+
+    if 'logged_in' in session and session['logged_in'] and 'email' in session:
+        email = session['email']
+
+        params = {"email" : email,
+                  "key" : API_KEY}
+        endpoint = API_ENDPOINT + "get_user_orders"
+        response = re.post(url=endpoint, data=params)
+        
+        response = response.json()
+
+        if response['fulfilled_orders'] != None and response['fulfilled_orders'] != None:
+            orders = {}
+            orders['fulfilled_orders'] = response['fulfilled_orders']
+            orders['unfulfilled_orders'] = response['unfulfilled_orders']
+        else:
+            flash("An error ocurred while retrieving ordered item")
+
+        return render_template('my_orders.html', orders=orders)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

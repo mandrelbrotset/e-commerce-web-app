@@ -500,13 +500,19 @@ def edit_item():
 
 @app.route('/checkout', methods=["POST"])
 def checkout():
+    print("here")
+
     if request.method == "POST":
+        print("here 3")
+
         if "key" in request.form and request.form["key"] == API_KEY:
             name = request.form['name']
             email = request.form['email']
             phone = request.form['phone']
-            address = request.form['address']
+            address = json.loads(request.form['address'])
             total_amount = request.form['total_amount']
+
+            print(name, email, phone, address, total_amount)
 
             dt = datetime.datetime.now()
             # increase randomness by getting 
@@ -515,20 +521,23 @@ def checkout():
             # hash the string
             order_id  = hashing.hash_value(hash_string)
 
-            db.record_order(order_id, email, name, phone, total_amount)
+            ret = db.record_order(order_id, email, name, phone, total_amount)
             # store address for the order in the database
-            db.add_address(order_id, address)
+            ret1 = db.add_address(order_id, address)
             # move all items from cart to OrderItems
-            db.order_items(order_id, email)
+            ret2 = db.order_items(order_id, email)
 
-            return json.dumps({"result" : "success"})
+            if ret and ret1 and ret2:
+                return json.dumps({"result" : "success"})
+            else:
+                return json.dumps({"result" : "failed"})
 
         return json.dumps({"result" : ERR_1})
 
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/orders', methods=["POST"])
+@app.route('/all_orders', methods=["POST"])
 def orders():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -542,11 +551,18 @@ def orders():
                 unfulfilled_orders = []
 
                 for i in result:
+                    fulfillment_date = None
+                    # check if there is a fulfillemt date
+                    if i[7]:
+                        fulfillment_date = i[7].strftime("%d/%m/%Y %r")
+
+                    order_date = i[5].strftime("%d/%m/%Y %r")
+
                     order_details = {'order' : {'order_id':i[0], 'name':i[1], 
                                                 'email':i[2], 'phone':i[3], 
                                                 'total_amount':float(i[4]), 
-                                                'date':i[5], 'fulfilled':bool(i[6]),
-                                                'fulfillment_date':i[7]},
+                                                'date': order_date, 'fulfilled':bool(i[6]),
+                                                'fulfillment_date': fulfillment_date},
                                     'address' : {'street':i[8], 'apt_no':i[9],
                                                     'city':i[10], 'state':i[11], 
                                                     'zip_code':i[12], 'country':i[13]}}
@@ -555,9 +571,6 @@ def orders():
                         fulfilled_orders.append(order_details)
                     else:
                         unfulfilled_orders.append(order_details)
-
-                    print(fulfilled_orders)
-                    print(unfulfilled_orders)
 
             return json.dumps({"fulfilled_orders" : fulfilled_orders,
                                 "unfulfilled_orders" : unfulfilled_orders})
@@ -568,11 +581,59 @@ def orders():
                        "unfulfilled_orders" : None})
 
 
+@app.route('/get_user_orders', methods=["POST"])
+def get_user_orders():
+    if request.method == "POST":
+        if "key" in request.form and request.form["key"] == API_KEY:
+            email = request.form['email']
+
+            result = db.get_user_orders(email)
+
+            fulfilled_orders = None
+            unfulfilled_orders = None
+
+            if result != None:
+                fulfilled_orders = []
+                unfulfilled_orders = []
+
+                for i in result:
+                    fulfillment_date = None
+                    # check if there is a fulfillemt date
+                    if i[7]:
+                        fulfillment_date = i[7].strftime("%d/%m/%Y %r")
+
+                    order_date = i[5].strftime("%d/%m/%Y %r")
+
+                    order_details = {'order' : {'order_id':i[0], 'name':i[1], 
+                                                'email':i[2], 'phone':i[3], 
+                                                'total_amount':float(i[4]), 
+                                                'date': order_date, 'fulfilled':bool(i[6]),
+                                                'fulfillment_date': fulfillment_date},
+                                    'address' : {'street':i[8], 'apt_no':i[9],
+                                                    'city':i[10], 'state':i[11], 
+                                                    'zip_code':i[12], 'country':i[13]}}
+
+                    if bool(i[6]):
+                        fulfilled_orders.append(order_details)
+                    else:
+                        unfulfilled_orders.append(order_details)
+
+            return json.dumps({"fulfilled_orders" : fulfilled_orders,
+                                "unfulfilled_orders" : unfulfilled_orders})
+
+        return json.dumps({"result" : ERR_1})
+
+    return json.dumps({"fulfilled_orders" : None,
+                       "unfulfilled_orders" : None})
+
+
+
 @app.route('/fulfill_order', methods=["POST"])
 def fulfill_order():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
             id = request.form['order_id']
+
             # mark order as fulfilled
             ret = db.mark_as_fulfilled(id)
 

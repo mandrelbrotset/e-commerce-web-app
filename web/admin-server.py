@@ -125,7 +125,7 @@ def admin_dashboard():
 
             # get orders
             params = {"key" : API_KEY}
-            endpoint = API_ENDPOINT + "orders"
+            endpoint = API_ENDPOINT + "all_orders"
             response = re.post(url=endpoint, data=params)
             orders = None
 
@@ -164,9 +164,15 @@ def show_item(id):
 @app.route('/fulfill_order', methods=["POST"])
 def fulfill_order():
     if "admin_logged_in" in session and session['admin_logged_in']:
+        print("hello 1")
+
         if request.method == "POST":
+            print("hello post")
+
             # save fulfilled order
             order_id = request.form["order_id"]
+
+            print("id:", order_id)
 
             params = {"key" : API_KEY,
                         "order_id" : order_id}

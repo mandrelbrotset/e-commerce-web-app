@@ -428,9 +428,29 @@ class Database(object):
 
         return False
 
+    def get_user_orders(self, email):
+        if self.connect():
+            query = """SELECT o.order_id, o.name, o.email, o.phone, o.total_amount, o.date, 
+                    o.fulfilled, o.fulfillment_date,
+                    a.street, a.apt_no, a.city, a.state, a.zip_code, a.country 
+                    FROM OrderDetail o 
+                    JOIN Address a 
+                    ON o.order_id = a.address_id
+                    WHERE o.email = '{}'""".format(email)
+
+            self.cursor.execute(query)
+            result = self.cursor.fetchall()
+
+            self.connection.close()
+
+            if result != None:
+                return result
+
+        return False
+
     def mark_as_fulfilled(self, id):
         if self.connect():
-            query = "UPDATE OrderDetail SET fulfilled=1, fulfillment_date=now() WHERE order_id={}".format(id)
+            query = "UPDATE OrderDetail SET fulfilled=1, fulfillment_date=now() WHERE order_id='{}'".format(id)
 
             self.cursor.execute(query)
             self.connection.commit()

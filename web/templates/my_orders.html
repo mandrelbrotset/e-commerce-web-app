@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+        
+<style>
+    h2, h3 {
+        text-align: center;
+        padding-top: 15px;
+    }
+</style>
+
+<div id="my-orders">
+    <h3>Unulfilled Orders</h3>
+    {% if orders %}
+        <div class='list-group cart-group'>
+        {% if orders['unfulfilled_orders'] | length > 0 %}
+            {% for order in orders['unfulfilled_orders'] %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div>
+                        <p>Customer name: {{ order['order']['name'] }}</p>
+                        <p>Customer email: {{ order['order']['email'] }}</p>
+                        <p>Customer phone: {{ order['order']['phone'] }}</p>
+                        <p>Order total: {{ order['order']['total_amount'] }}</p>
+                        <p>Order date: {{ order['order']['date'] }}</p>
+
+                        <p> 
+                            {% if order['order']['fulfilled'] == True %}
+                                Order has been fulfilled
+                            {% else %}
+                                Order has not been fulfilled
+                            {% endif %}
+                        </p> 
+                    </div>
+                
+                    <div>
+                        <h6>Shipping address</h6>
+                        <p>{{ order['address']['street'] }} {{ order['address']['apt_no'] }}</p>
+                        <p>{{ order['address']['city'] }}, {{ order['address']['state'] }} {{ order['address']['zip_code'] }}</p>
+                        <p>{{ order['address']['country'] }}</p>
+                    </div>
+                </div>
+            {% endfor %}    
+        {% else %}
+            <p>You do not have any unfulfilled orders</p>
+        {% endif %}
+        </div>
+    {% endif %}
+
+    <h3>Fulfilled Orders</h3>
+    {% if orders %}
+        <div class='list-group cart-group'>
+        {% if orders['fulfilled_orders'] | length > 0 %}
+            {% for order in orders['fulfilled_orders'] %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div>
+                        <p>Customer name: {{ order['order']['name'] }}</p>
+                        <p>Customer email: {{ order['order']['email'] }}</p>
+                        <p>Customer phone: {{ order['order']['phone'] }}</p>
+                        <p>Order total: {{ order['order']['total_amount'] }}</p>
+                        <p>Order date: {{ order['order']['date'] }}</p>
+
+                        <p> 
+                            {% if order['order']['fulfilled'] == True %}
+                                Order has been fulfilled
+                            {% else %}
+                                Order has not been fulfilled
+                            {% endif %}
+                        </p> 
+
+                        <p>Fulfilled on: {{ order['order']['fulfillment_date'] }}</p>
+                    </div>
+                    
+                    <div>
+                        <h6>Shipping address</h6>
+                        <p>{{ order['address']['street'] }} {{ order['address']['apt_no'] }}</p>
+                        <p>{{ order['address']['city'] }}, {{ order['address']['state'] }} {{ order['address']['zip_code'] }}</p>
+                        <p>{{ order['address']['country'] }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>There are currently no orders to fulfill</p>
+        {% endif %}
+        </div>
+    {% endif %}
+</div>
+    
+{% endblock %}
