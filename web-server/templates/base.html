@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+
+    <style>
+        li {
+            list-style-type: none;
+        }
+
+        .hello {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        /* ---- Style for home ----- */
+        #loading {
+            display: block;
+            width: 300px;
+            margin-top: 90px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cart-group {
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .cart-group img {
+            float: left;
+        }
+        .side-content {
+            float: left;
+            padding-left: 10px;
+            padding-top: 35px;
+        }
+        
+        .side-content p {
+            padding-left: 25px;
+        }
+
+        .side-content small {
+            padding-left: 25px;
+        }
+        /* ----- End style for home ----- */
+
+        /*  ---- Style for Login and Sign Up page  */
+        .form {
+            width: 23.3%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 20px;
+        }
+
+        .form h2 {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .form p {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .ig {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        input {
+            padding: 0px 4px;
+            border: 1px #d4d4d4 solid;
+        }    
+        /*  ----- End style for Login and Sign up page ----  */
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Navbar</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+            aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                
+            {% if 'logged_in' in session %}
+                {% if session['logged_in'] %}
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Orders<span class="sr-only">(current)</span></a>
+                        </li>
+        
+                    </ul>
+
+                    <form class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+
+                    {% if 'first_name' in session %}
+                    <div class="dropdown nav-item justify-content-end hello">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            Hello, {{ session['first_name'] }}
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/account">My account</a>
+                            <a class="dropdown-item" href="/my_orders">Orders</a>
+                            <a class="dropdown-item" href="/signout">Sign out</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if 'email' in session %}
+                    <a href="/cart" class="nav-item btn btn-primary">View Cart</a>
+                    {% endif %}
+                {% endif %}
+
+            {% elif 'admin_logged_in' in session %}
+                {% if session['admin_logged_in'] %}
+                    {% if 'admin_first_name' in session %}
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
+
+                    <a href="/admin_dashboard" class="nav-item btn btn-info">Admin dashboard</a>
+
+                    <div class="dropdown nav-item justify-content-end hello">    
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                            Hello, {{ session['admin_first_name'] }} (Admin)
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/admin_account">My account</a>
+                            <a class="dropdown-item" href="/admin_signout">Sign out</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+            {% else %}
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
+                <a href="/sign_in" class="nav-item btn btn-primary">Sign in</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+
+</html>

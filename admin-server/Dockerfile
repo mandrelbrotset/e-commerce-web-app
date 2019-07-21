@@ -23,4 +23,4 @@ LABEL maintainer="Sheriff Olaoye" \
 RUN chmod +x start-nginx.sh
 ENTRYPOINT ["/app/start-nginx.sh"]
 
-CMD gunicorn rest-api:app
+CMD gunicorn admin-server:app

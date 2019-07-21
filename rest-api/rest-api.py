@@ -647,5 +647,5 @@ def fulfill_order():
     return json.dumps({"result" : ERR_5})
                 
 
-if __name__ == "__main__":
-    app.run(debug=True, port="5002")
+#if __name__ == "__main__":
+#   app.run(debug=True, port="5002")
