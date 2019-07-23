@@ -4,7 +4,8 @@ import config
 class Database(object):
     def __init__(self):
         self.db_username = config.db_username
-        self.db_host = config.db_endpoint
+        self.db_host = config.DB_HOST
+        self.db_port = config.DB_PORT
         self.db_name = config.db_name
         self.db_password = config.db_password        
         self.connection = None
@@ -12,7 +13,7 @@ class Database(object):
 
     def connect(self):
         try:
-            self.connection = pymysql.connect(host=self.db_host, user=self.db_username, db=self.db_name, password=self.db_password)
+            self.connection = pymysql.connect(host=self.db_host, user=self.db_username, db=self.db_name, password=self.db_password, port=self.db_port)
             self.cursor = self.connection.cursor()
             return True
         except:

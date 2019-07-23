@@ -3,10 +3,10 @@ from flask import Flask, request, render_template, flash, session, redirect, \
 import requests as re
 from werkzeug.utils import secure_filename
 import json
-import os
+import config
 
 
-API_ENDPOINT = "http://127.0.0.1:5002/"
+API_ENDPOINT = config.REST_API
 API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
 UPLOAD_FOLDER = "static/images"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'svg'])

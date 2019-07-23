@@ -1,5 +1,5 @@
-CREATE USER 'rest-api'@'localhost' IDENTIFIED BY 'password';
-GRANT CREATE, DELETE, INSERT, SELECT, UPDATE ON * . * TO 'rest-api'@'localhost';
+CREATE USER 'rest-api'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+GRANT CREATE, DELETE, INSERT, SELECT, UPDATE ON * . * TO 'rest-api'@'%';
 FLUSH PRIVILEGES;
 
 CREATE DATABASE microservice;

@@ -12,7 +12,11 @@ services:
     build: ./rest-api
     depends_on:
       - 'mysql'
-
+    environment:
+      - DB_HOST=microservices_mysql-service_1
+      - DB_PORT=3306
+    ports:
+      - '5002:8000'
     networks:
       - back-tier
       - front-tier
@@ -21,6 +25,8 @@ services:
     build: ./admin-server
     depends_on:
       - 'rest-api'
+    environment:
+      - REST_API=microservices_rest-api_1
     ports:
       - '5001:80'
     networks:
@@ -30,10 +36,12 @@ services:
     build: ./web-server
     depends_on:
       - 'rest-api'
+    environment:
+      - REST_API=microservices_rest-api_1
     ports:
       - '5000:80'
     networks:
-      - back-tier
+      - front-tier
 
 networks:
   back-tier:

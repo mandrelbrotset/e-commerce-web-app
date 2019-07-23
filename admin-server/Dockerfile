@@ -20,7 +20,7 @@ COPY . .
 LABEL maintainer="Sheriff Olaoye" \
       version="1.0"
 
-RUN chmod +x start-nginx.sh
-ENTRYPOINT ["/app/start-nginx.sh"]
+RUN chmod +x startup-script.sh
+ENTRYPOINT ["/app/startup-script.sh"]
 
 CMD gunicorn admin-server:app
