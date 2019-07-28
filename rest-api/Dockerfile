@@ -23,4 +23,4 @@ LABEL maintainer="Sheriff Olaoye" \
 RUN chmod +x startup-script.sh
 ENTRYPOINT ["/app/startup-script.sh"]
 
-CMD gunicorn rest-api:app
+CMD gunicorn --log-level=info --bind unix:/tmp/socket rest-api:app

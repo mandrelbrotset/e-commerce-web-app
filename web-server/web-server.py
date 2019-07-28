@@ -2,12 +2,14 @@ from flask import Flask, request, render_template, flash, session, redirect, \
     url_for, send_from_directory
 import requests as re
 from werkzeug.utils import secure_filename
+import logging
 import json
 import config
 
 
 # Rest API endpoint
 API_ENDPOINT = config.REST_API
+#API_ENDPOINT = "http://127.0.0.1:5001/"
 
 API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
 UPLOAD_FOLDER = "static/images"
@@ -16,6 +18,10 @@ UPLOAD_FOLDER = "static/images"
 app = Flask(__name__, static_folder='static')
 app.secret_key = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
 
+if __name__ != "__main__":
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 @app.route('/')
 def home():
@@ -47,6 +53,8 @@ def user_signup():
             # make a POST request to the Rest API
             response = re.post(url=endpoint, data=params)
             response = json.loads(response.text)
+
+            app.logger.debug("--> sign up " + response['result'])
 
             # if API call succeeds
             if response['result'] == "success":
@@ -125,10 +133,14 @@ def signout():
 
 @app.route('/get_products', methods=["GET"])
 def get_products():
+    app.logger.debug("--> getting products")
+
     params = {"key" : API_KEY}
     endpoint = API_ENDPOINT + "get_items"
     response = re.post(url=endpoint, data=params)
     response = json.loads(response.text)
+
+    app.logger.debug("--> get products" + response['result'])
 
     if response['result'] == "success":
         products = response['items']

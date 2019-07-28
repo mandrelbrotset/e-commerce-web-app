@@ -15,8 +15,11 @@ services:
     environment:
       - DB_HOST=microservices_mysql-service_1
       - DB_PORT=3306
+      - DB_PASSWORD=password
+      - DB_USERNAME=rest-api
+      - DB_NAME=microservice
     ports:
-      - '5002:8000'
+      - '5002:80'
     networks:
       - back-tier
       - front-tier
@@ -39,7 +42,7 @@ services:
     environment:
       - REST_API=microservices_rest-api_1
     ports:
-      - '5000:80'
+      - '80:80'
     networks:
       - front-tier
 

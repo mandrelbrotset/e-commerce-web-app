@@ -4,6 +4,7 @@ import random
 import json
 import datetime
 from database import Database
+import logging
 
 app = Flask(__name__)
 hashing = Hashing(app)
@@ -17,6 +18,11 @@ ERR_2 = "Username not available"
 ERR_3 = "Failed to create account"
 ERR_4 = "Unable to add item"
 ERR_5 = "Invalid method"
+
+if __name__ != "__main__":
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 
 # helper function to generate password hash and salt
@@ -195,6 +201,8 @@ def add_item():
 
 @app.route('/get_items', methods=["POST"])
 def get_items():
+    app.logger.debug("--> get items")
+
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
             items = db.get_items()
