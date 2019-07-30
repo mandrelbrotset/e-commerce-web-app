@@ -19,6 +19,7 @@ ERR_3 = "Failed to create account"
 ERR_4 = "Unable to add item"
 ERR_5 = "Invalid method"
 
+
 if __name__ != "__main__":
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
@@ -77,8 +78,14 @@ def user_signup():
 
 @app.route('/admin_signup', methods=["POST"])
 def admin_signup():
+    app.logger.info("Recieved request")
+
     if request.method == "POST":
+        app.logger.info("Recieved POST request")
+
         if "key" in request.form and request.form["key"] == API_KEY:
+            app.logger.info("Recieved POST request with key")
+
             # get data from the request
             f_name = request.form["first_name"]
             l_name = request.form["last_name"]

@@ -4,11 +4,11 @@ import requests as re
 from werkzeug.utils import secure_filename
 import json
 import config
-
+import os
 
 API_ENDPOINT = config.REST_API
 API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
-UPLOAD_FOLDER = "static/images"
+UPLOAD_FOLDER = "item_pictures"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'svg'])
 
 # flask config
@@ -26,7 +26,7 @@ def admin_signup():
         email = request.form["email"]
         password = request.form["password"]
 
-        if len(f_name) > 0 and len(l_name) > 0 and len(email) > 0 and len(password) > 8:
+        if len(f_name) > 0 and len(l_name) > 0 and len(email) > 0 and len(password) >= 8:
             # Rest API endpoint
             endpoint = API_ENDPOINT + "admin_signup"
 
@@ -52,7 +52,7 @@ def admin_signup():
 
                 return redirect(url_for("admin_dashboard"))
             else:
-                error = response['result']
+                flash(response['result'])
 
         else:
             error = []

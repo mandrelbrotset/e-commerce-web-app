@@ -12,18 +12,17 @@ class Database(object):
         self.db_name = config.DB_NAME
         self.db_password = config.DB_PASSWORD
         self.connection = None
+        #print(self.db_host, self.db_username, self.db_name, self.db_password, self.db_port)
         
 
     def connect(self):
         try:
-            self.connection = pymysql.connect(host="microservices_mysql_1", user="rest-api", db="microservice", password="password")
-            #self.connection = pymysql.connect(host="localhost", user="rest-api", db="microservice", password="password")
-            #self.connection = pymysql.connect(host=self.db_host, user=self.db_username, db=self.db_name, password=self.db_password, port=self.db_port)
+            self.connection = pymysql.connect(host=self.db_host, user=self.db_username, db=self.db_name, password=self.db_password)
             self.cursor = self.connection.cursor()
-            gunicorn_logger.info("--> connected")
+            gunicorn_logger.info("Connected to database")
             return True
         except:
-            gunicorn_logger.info("--> failed to connect")
+            gunicorn_logger.info("Failed to connect to database")
             return False
             
 
