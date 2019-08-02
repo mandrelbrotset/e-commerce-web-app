@@ -7,17 +7,17 @@ import config
 import os
 
 API_ENDPOINT = config.REST_API
-API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
+API_KEY = config.API_KEY
 UPLOAD_FOLDER = "item_pictures"
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'svg'])
+ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif", "bmp", "tif", "svg"])
 
 # flask config
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, static_folder="static")
 app.secret_key = "2cpdgildcbdspdbqyee10svy6nmom0reiyzujsn048ri7nsaej"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
-@app.route('/admin_signup', methods=["GET", "POST"])
+@app.route("/admin_signup", methods=["GET", "POST"])
 def admin_signup():
     if request.method == "POST":
         # get data from html form
@@ -41,21 +41,20 @@ def admin_signup():
             response = json.loads(response.text)
 
             # if API call succeeds
-            if response['result'] == "success":
+            if response["result"] == "success":
                 # save variables in session storage
-                session['admin_logged_in'] = True
-                session['email'] = email
+                session["admin_logged_in"] = True
+                session["email"] = email
                 # save first name in  session storage with first letter capitalized
-                session['admin_first_name'] = f_name.title()
+                session["admin_first_name"] = f_name.title()
                 # redirect to dashboard
-                session.pop('logged_in', None)
+                session.pop("logged_in", None)
 
                 return redirect(url_for("admin_dashboard"))
             else:
-                flash(response['result'])
+                flash(response["result"])
 
         else:
-            error = []
             if len(f_name) <= 0:
                 flash("You must enter a first name")
             if len(l_name) <= 0:
@@ -68,7 +67,7 @@ def admin_signup():
     return render_template("admin_signup.html")
 
 
-@app.route('/',  methods=["GET", "POST"])
+@app.route("/",  methods=["GET", "POST"])
 def admin_signin():
     if request.method == "POST":
         email = request.form["email"]
@@ -86,32 +85,32 @@ def admin_signin():
         response = json.loads(response.text)
 
         # if API call succeeds
-        if response['result'] == "success":
+        if response["result"] == "success":
             # save email in session storage
-            session['email'] = email
+            session["email"] = email
             # save first name in  session storage with first letter capitalized
-            session['admin_first_name'] = response['first_name'].title()
+            session["admin_first_name"] = response["first_name"].title()
     
-            session['admin_logged_in'] = True
+            session["admin_logged_in"] = True
             # redirect to dashboard
             return redirect(url_for("admin_dashboard"))
         else:
             flash("Invalid username or password. Please try again!")
 
-    if "admin_logged_in" in session and 'email' in session:
-        if session['admin_logged_in']:
+    if "admin_logged_in" in session and "email" in session:
+        if session["admin_logged_in"]:
             return redirect(url_for("admin_dashboard"))
 
     return render_template("admin_signin.html")
 
 
-@app.route('/admin_dashboard')
+@app.route("/admin_dashboard")
 def admin_dashboard():
     if "admin_logged_in" in session:
-        if session['admin_logged_in']:
+        if session["admin_logged_in"]:
             data = {}
-            data['email'] = session['email']
-            data['first_name'] = session['admin_first_name']
+            data["email"] = session["email"]
+            data["first_name"] = session["admin_first_name"]
 
             # get items currently in stock
             params = {"key" : API_KEY}
@@ -119,9 +118,9 @@ def admin_dashboard():
             response = re.post(url=endpoint, data=params)
             response = response.json()
             
-            data['products'] = None
-            if response['result'] == "success":
-                data['products'] = response['items']
+            products = None
+            if response["result"] == "success":
+                products = response["items"]
 
             # get orders
             params = {"key" : API_KEY}
@@ -130,21 +129,21 @@ def admin_dashboard():
             orders = None
 
             response = response.json()
-            if response['fulfilled_orders'] != None and response['fulfilled_orders'] != None:
+            if response["fulfilled_orders"] != None and response["fulfilled_orders"] != None:
                 orders = {}
-                orders['fulfilled_orders'] = response['fulfilled_orders']
-                orders['unfulfilled_orders'] = response['unfulfilled_orders']
+                orders["fulfilled_orders"] = response["fulfilled_orders"]
+                orders["unfulfilled_orders"] = response["unfulfilled_orders"]
             else:
                 flash("An error ocurred while retrieving ordered item")
 
-            return render_template('admin_dashboard.html', data=data, orders=orders)
+            return render_template("admin_dashboard.html", products=products, orders=orders)
     else:
         return redirect(url_for("admin_signin"))
 
 
-@app.route('/item/<int:id>')
+@app.route("/item/<int:id>")
 def show_item(id):
-    data = {'item': None}
+    data = {"item": None}
 
     params = {"item_id" : id,
               "key" : API_KEY}
@@ -153,17 +152,17 @@ def show_item(id):
     response = re.post(url=endpoint, data=params)
     response = json.loads(response.text)
 
-    if response['result'] == "success":
-        data['item'] = response['item']
-        return render_template('item.html', data=data)
+    if response["result"] == "success":
+        data["item"] = response["item"]
+        return render_template("item.html", data=data)
 
     # implement error page
     return "<html>Item not found</html>"
 
 
-@app.route('/fulfill_order', methods=["POST"])
+@app.route("/fulfill_order", methods=["POST"])
 def fulfill_order():
-    if "admin_logged_in" in session and session['admin_logged_in']:
+    if "admin_logged_in" in session and session["admin_logged_in"]:
         print("hello 1")
 
         if request.method == "POST":
@@ -188,11 +187,11 @@ def fulfill_order():
 
             redirect(url_for("admin_dashboard"))
 
-    return redirect(url_for('admin_signin'))
+    return redirect(url_for("admin_signin"))
 
-@app.route('/add_item', methods=["POST"])
+@app.route("/add_item", methods=["POST"])
 def add_item():
-    if "admin_logged_in" in session and session['admin_logged_in']:
+    if "admin_logged_in" in session and session["admin_logged_in"]:
         if request.method == "POST":
             name = request.form["name"]
             quantity = request.form["quantity"]
@@ -204,7 +203,7 @@ def add_item():
 
             # save image
             image_url = ""
-            image_url = save_image(request.files, 'image')
+            image_url = save_image(request.files, "image")
             if not image_url:
                 error_flag = True
                 flash("Upload an image")
@@ -231,16 +230,16 @@ def add_item():
                 else:
                     flash("Error adding item to stock")
 
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for("admin_dashboard"))
 
     else:
-        return redirect(url_for('admin_signin'))
+        return redirect(url_for("admin_signin"))
 
 
 # work on this function !!!!
-@app.route('/edit_item', methods=["POST"])
+@app.route("/edit_item", methods=["POST"])
 def edit_item():
-    if "admin_logged_in" in session and session['admin_logged_in']:
+    if "admin_logged_in" in session and session["admin_logged_in"]:
         if request.method == "POST":
             item_id = request.form["item_id"]
             name = request.form["name"]
@@ -251,12 +250,12 @@ def edit_item():
             image_name = request.form["image_name"]
 
             # save image if an image is uploaded
-            if 'image' in request.files and request.files['image'].filename != "":
-                image_url = save_image(request.files['image'], 'image')
+            if "image" in request.files and request.files["image"].filename != "":
+                image_url = save_image(request.files["image"], "image")
 
                 if not image_url:
                     flash("Error selected image is not supported")
-                    return redirect(url_for('admin_dashboard'))
+                    return redirect(url_for("admin_dashboard"))
             else:
                 image_url = image_name
             
@@ -276,20 +275,20 @@ def edit_item():
             if response.status_code == 200:
                 response = response.json()
 
-                if response['result'] == "success":
+                if response["result"] == "success":
                     flash("Saved!")
             else:
                 flash("Server error")
                 
-            return redirect(url_for('admin_dashboard'))
+            return redirect(url_for("admin_dashboard"))
         
-    return redirect(url_for('admin_signin'))
+    return redirect(url_for("admin_signin"))
 
 
-@app.route('/delete_item', methods=["POST"])
+@app.route("/delete_item", methods=["POST"])
 def delete_item():
     if "admin_logged_in" in session:
-        if session['admin_logged_in']:
+        if session["admin_logged_in"]:
             if request.method == "POST":
                 item_id = request.form["item_id"]
 
@@ -305,67 +304,66 @@ def delete_item():
                 else:
                     flash("Error deleting item")
 
-                return redirect(url_for('admin_dashboard'))
+                return redirect(url_for("admin_dashboard"))
 
 
-@app.route('/admin_signout')
+@app.route("/admin_signout")
 def admin_signout():
-    session.pop('admin_logged_in', None)
-    session.pop('email', None)
-    session.pop('first_name', None)
-    return redirect(url_for('admin_signin'))
+    session.pop("admin_logged_in", None)
+    session.pop("email", None)
+    session.pop("first_name", None)
+    return redirect(url_for("admin_signin"))
 
 
-@app.route('/admin_account')
+@app.route("/admin_account")
 def admin_account():
-    data = {'msg' : None,
-            'first_name' : None,
-            'last_name' : None}
+    data = {"first_name" : None,
+            "last_name" : None}
 
-    if 'admin_logged_in' in session:
-        if session['admin_logged_in']:
-            params = {"email" : session['email'],
+    if "admin_logged_in" in session:
+        if session["admin_logged_in"]:
+            params = {"email" : session["email"],
                     "key" : API_KEY}
 
             endpoint = API_ENDPOINT + "admin_account"
             response = re.post(url=endpoint, data=params)
             response = json.loads(response.text)
 
-            if response['result'] == "success":
-                data['first_name'] = response['first_name']
-                data['last_name'] = response['last_name']
+            if response["result"] == "success":
+                data["first_name"] = response["first_name"]
+                data["last_name"] = response["last_name"]
     else:
-        data['msg'] = "Log in to see your account details"
+        flash("Log in to see your account details")
 
-    return render_template('admin_account.html', data=data)
+    return render_template("admin_account.html", data=data)
 
 
-@app.route('/delete_admin_account')
+@app.route("/delete_admin_account")
 def delete_admin_account():
-    if 'admin_logged_in' in session:
-        if session['admin_logged_in']:
-            params = {"email" : session['email'],
+    if "admin_logged_in" in session:
+        if session["admin_logged_in"]:
+            params = {"email" : session["email"],
                       "key" : API_KEY}
 
             endpoint = API_ENDPOINT + "delete_admin_account"
             response = re.post(url=endpoint, data=params)
             response = json.loads(response.text)
 
-            session.pop('admin_logged_in', None)
-            session.pop('email', None)
-            session.pop('first_name', None)
+            session.pop("admin_logged_in", None)
+            session.pop("email", None)
+            session.pop("first_name", None)
     
-            return redirect(url_for('home'))
+            return redirect(url_for("home"))
 
 
-@app.route('/change_admin_name', methods=["POST"])
+@app.route("/change_admin_name", methods=["POST"])
 def change_admin_name():
-    data = {'msg' : None}
+    data = {"msg" : None}
 
     if request.method == "POST":
-        email = session['email']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
+        email = session["email"]
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
 
         params = {"email" : email,
                   "first_name" : first_name.title(),
@@ -374,27 +372,27 @@ def change_admin_name():
 
         # change first name stored in session
         if len(first_name):
-            session['admin_first_name'] = first_name
+            session["admin_first_name"] = first_name
 
         endpoint = API_ENDPOINT + "change_admin_name"
         response = re.post(url=endpoint, data=params)
         response = response.json()
 
-        if response['result'] == "success":
-            data['msg'] = "Changed name successfully!"
+        if response["result"] == "success":
+            data["msg"] = "Changed name successfully!"
         else:
-            data['msg'] = "Error changing name."
+            data["msg"] = "Error changing name."
 
-        return redirect(url_for('admin_account'))
+        return redirect(url_for("admin_account"))
         
 
-@app.route('/change_admin_password', methods=["POST"])
+@app.route("/change_admin_password", methods=["POST"])
 def change_admin_password():
-    data = {'msg' : None}
+    data = {"msg" : None}
 
     if request.method == "POST":
-        email = session['email']
-        password = request.form['password']
+        email = session["email"]
+        password = request.form["password"]
 
         params = {"email" : email,
                   "password" : password,
@@ -404,12 +402,12 @@ def change_admin_password():
         response = re.post(url=endpoint, data=params)
         response = response.json()
 
-        if response['result'] == "success":
-            data['msg'] = "Changed password successfully!"
+        if response["result"] == "success":
+            data["msg"] = "Changed password successfully!"
         else:
-            data['msg'] = "Error changing password."
+            data["msg"] = "Error changing password."
 
-        return redirect(url_for('admin_account'))
+        return redirect(url_for("admin_account"))
 
 
 # helper functions
@@ -417,16 +415,16 @@ def save_image(request_files, file_name):
     if file_name in request_files and request_files[file_name].filename != "" \
     and allowed_file(request_files[file_name].filename):
         new_filename = secure_filename(request_files[file_name].filename)
-        image_url = os.path.join(app.config['UPLOAD_FOLDER'], new_filename)
+        image_url = os.path.join(app.config["UPLOAD_FOLDER"], new_filename)
         request_files[file_name].save(image_url)
         return new_filename
     else:
         return None
 
 def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return "." in filename and \
+        filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-#if __name__ == "__main__":
-#    app.run(debug=True, port=5004)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True, port=5002)

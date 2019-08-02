@@ -1,63 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    <style>
-        /* ---- style for account  ---- */
-        .account-content {
-            width: 28%;
-            margin-top: 20px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .account-content h2 {
-            padding-top: 15px;
-            text-align: center;
-        }
-
-        .account-content h4 {
-            padding-top: 20px;
-            text-align: center;
-        }
-
-        .bio-container {
-            width: 100%;
-            float: left;
-            margin-bottom: 20px;
-            margin-bottom: 25px;
-        }
-
-        .name-email {
-            width: 32%;
-            float: left;
-        }
-
-        .name-value {
-            width: 68%;
-            float: left;
-        }
-
-        .chg-name-btn {
-            width: 40%;
-            margin-left: 30%;
-        }
-
-        .chg-name-btn {
-            width: 40%;
-            margin-left: 30%;
-        }
-
-        .chg-passwd-btn {
-            width: 50%;
-            margin-left: 25%;
-        }
-
-        .delete-btn {
-            margin-top: 60px;
-            width: 60%;
-            margin-left: 20%;
-        }
-    </style>
-
+    
     <div class="account-content">
         {% if 'admin_logged_in' in session %}
             {% if session['admin_logged_in'] %}
@@ -117,12 +60,18 @@
             {% endif %}
         {% endif %}
     
-        {% if data['msg'] %}
-            <div class="alert alert-info" role="alert">
-                {{ data['msg'] }}
-            </div>
-        {% endif %}
-                
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <br><br>
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert" id="message">
+                        {{ message }}
+                        <button onclick="hide_message()">x</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}        
+
     </div>
 
 {% endblock %}

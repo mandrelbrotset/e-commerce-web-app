@@ -5,12 +5,14 @@ import json
 import datetime
 from database import Database
 import logging
+import config
+
 
 app = Flask(__name__)
 hashing = Hashing(app)
 db = Database()
 
-API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
+API_KEY = config.API_KEY
 
 # Error codes
 ERR_1 = "API Key Required"
@@ -21,9 +23,12 @@ ERR_5 = "Invalid method"
 
 
 if __name__ != "__main__":
-    gunicorn_logger = logging.getLogger("gunicorn.error")
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+    try:
+        gunicorn_logger = logging.getLogger("gunicorn.error")
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+    except:
+        pass
 
 
 # helper function to generate password hash and salt
@@ -42,7 +47,7 @@ def generate_hash(password):
     return salt, hash
 
 
-@app.route('/signup', methods=["POST"])
+@app.route("/signup", methods=["POST"])
 def user_signup():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -76,7 +81,7 @@ def user_signup():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/admin_signup', methods=["POST"])
+@app.route("/admin_signup", methods=["POST"])
 def admin_signup():
     app.logger.info("Recieved request")
 
@@ -116,7 +121,7 @@ def admin_signup():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/sign_in', methods=["POST"])
+@app.route("/sign_in", methods=["POST"])
 def user_sign_in():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -151,7 +156,7 @@ def user_sign_in():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/admin_signin', methods=["POST"])
+@app.route("/admin_signin", methods=["POST"])
 def admin_signin():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:                
@@ -183,7 +188,7 @@ def admin_signin():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/add_item', methods=["POST"])
+@app.route("/add_item", methods=["POST"])
 def add_item():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -206,7 +211,7 @@ def add_item():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/get_items', methods=["POST"])
+@app.route("/get_items", methods=["POST"])
 def get_items():
     app.logger.debug("--> get items")
 
@@ -231,7 +236,7 @@ def get_items():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/item_by_id', methods=["POST"])
+@app.route("/item_by_id", methods=["POST"])
 def item_by_id():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -251,7 +256,7 @@ def item_by_id():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/add_to_cart', methods=["POST"])
+@app.route("/add_to_cart", methods=["POST"])
 def add_to_cart():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -280,7 +285,7 @@ def add_to_cart():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/cart', methods=["POST"])
+@app.route("/cart", methods=["POST"])
 def cart():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -312,7 +317,7 @@ def cart():
     return json.dumps({"result" : ERR_5})
                 
 
-@app.route('/account', methods=["POST"])
+@app.route("/account", methods=["POST"])
 def account():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -332,7 +337,7 @@ def account():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/change_name', methods=["POST"])
+@app.route("/change_name", methods=["POST"])
 def change_name():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -340,10 +345,10 @@ def change_name():
             first_name = ""
             last_name = ""
 
-            if 'first_name' in request.form:
+            if "first_name" in request.form:
                 first_name = request.form["first_name"]
 
-            if 'last_name' in request.form:
+            if "last_name" in request.form:
                 last_name = request.form["last_name"]
 
             if db.change_name(email, first_name, last_name):
@@ -356,7 +361,7 @@ def change_name():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/change_password', methods=["POST"])
+@app.route("/change_password", methods=["POST"])
 def change_password():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -377,7 +382,7 @@ def change_password():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/delete_account', methods=["POST"])
+@app.route("/delete_account", methods=["POST"])
 def delete_account():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -393,7 +398,7 @@ def delete_account():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/admin_account', methods=["POST"])
+@app.route("/admin_account", methods=["POST"])
 def admin_account():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -412,7 +417,7 @@ def admin_account():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/change_admin_name', methods=["POST"])
+@app.route("/change_admin_name", methods=["POST"])
 def change_admin_name():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -420,10 +425,10 @@ def change_admin_name():
             first_name = ""
             last_name = ""
 
-            if 'first_name' in request.form:
+            if "first_name" in request.form:
                 first_name = request.form["first_name"]
 
-            if 'last_name' in request.form:
+            if "last_name" in request.form:
                 last_name = request.form["last_name"]
 
             if db.change_admin_name(email, first_name, last_name):
@@ -436,7 +441,7 @@ def change_admin_name():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/change_admin_password', methods=["POST"])
+@app.route("/change_admin_password", methods=["POST"])
 def change_admin_password():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -457,7 +462,7 @@ def change_admin_password():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/delete_admin_account', methods=["POST"])
+@app.route("/delete_admin_account", methods=["POST"])
 def delete_admin_account():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -473,7 +478,7 @@ def delete_admin_account():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/delete_item', methods=["POST"])
+@app.route("/delete_item", methods=["POST"])
 def delete_item():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -489,7 +494,7 @@ def delete_item():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/edit_item', methods=["POST"])
+@app.route("/edit_item", methods=["POST"])
 def edit_item():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -513,7 +518,7 @@ def edit_item():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/checkout', methods=["POST"])
+@app.route("/checkout", methods=["POST"])
 def checkout():
     print("here")
 
@@ -521,18 +526,18 @@ def checkout():
         print("here 3")
 
         if "key" in request.form and request.form["key"] == API_KEY:
-            name = request.form['name']
-            email = request.form['email']
-            phone = request.form['phone']
-            address = json.loads(request.form['address'])
-            total_amount = request.form['total_amount']
+            name = request.form["name"]
+            email = request.form["email"]
+            phone = request.form["phone"]
+            address = json.loads(request.form["address"])
+            total_amount = request.form["total_amount"]
 
             print(name, email, phone, address, total_amount)
 
             dt = datetime.datetime.now()
             # increase randomness by getting 
             dt_now = dt.strftime("%Y%H%M%S%f")
-            hash_string = name + email + address['street'] + dt_now
+            hash_string = name + email + address["street"] + dt_now
             # hash the string
             order_id  = hashing.hash_value(hash_string)
 
@@ -552,7 +557,7 @@ def checkout():
     return json.dumps({"result" : ERR_5})
 
 
-@app.route('/all_orders', methods=["POST"])
+@app.route("/all_orders", methods=["POST"])
 def orders():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
@@ -573,14 +578,14 @@ def orders():
 
                     order_date = i[5].strftime("%d/%m/%Y %r")
 
-                    order_details = {'order' : {'order_id':i[0], 'name':i[1], 
-                                                'email':i[2], 'phone':i[3], 
-                                                'total_amount':float(i[4]), 
-                                                'date': order_date, 'fulfilled':bool(i[6]),
-                                                'fulfillment_date': fulfillment_date},
-                                    'address' : {'street':i[8], 'apt_no':i[9],
-                                                    'city':i[10], 'state':i[11], 
-                                                    'zip_code':i[12], 'country':i[13]}}
+                    order_details = {"order" : {"order_id":i[0], "name":i[1], 
+                                                "email":i[2], "phone":i[3], 
+                                                "total_amount":float(i[4]), 
+                                                "date": order_date, "fulfilled":bool(i[6]),
+                                                "fulfillment_date": fulfillment_date},
+                                    "address" : {"street":i[8], "apt_no":i[9],
+                                                    "city":i[10], "state":i[11], 
+                                                    "zip_code":i[12], "country":i[13]}}
 
                     if bool(i[6]):
                         fulfilled_orders.append(order_details)
@@ -596,11 +601,11 @@ def orders():
                        "unfulfilled_orders" : None})
 
 
-@app.route('/get_user_orders', methods=["POST"])
+@app.route("/get_user_orders", methods=["POST"])
 def get_user_orders():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
-            email = request.form['email']
+            email = request.form["email"]
 
             result = db.get_user_orders(email)
 
@@ -619,14 +624,14 @@ def get_user_orders():
 
                     order_date = i[5].strftime("%d/%m/%Y %r")
 
-                    order_details = {'order' : {'order_id':i[0], 'name':i[1], 
-                                                'email':i[2], 'phone':i[3], 
-                                                'total_amount':float(i[4]), 
-                                                'date': order_date, 'fulfilled':bool(i[6]),
-                                                'fulfillment_date': fulfillment_date},
-                                    'address' : {'street':i[8], 'apt_no':i[9],
-                                                    'city':i[10], 'state':i[11], 
-                                                    'zip_code':i[12], 'country':i[13]}}
+                    order_details = {"order" : {"order_id":i[0], "name":i[1], 
+                                                "email":i[2], "phone":i[3], 
+                                                "total_amount":float(i[4]), 
+                                                "date": order_date, "fulfilled":bool(i[6]),
+                                                "fulfillment_date": fulfillment_date},
+                                    "address" : {"street":i[8], "apt_no":i[9],
+                                                    "city":i[10], "state":i[11], 
+                                                    "zip_code":i[12], "country":i[13]}}
 
                     if bool(i[6]):
                         fulfilled_orders.append(order_details)
@@ -643,11 +648,11 @@ def get_user_orders():
 
 
 
-@app.route('/fulfill_order', methods=["POST"])
+@app.route("/fulfill_order", methods=["POST"])
 def fulfill_order():
     if request.method == "POST":
         if "key" in request.form and request.form["key"] == API_KEY:
-            id = request.form['order_id']
+            id = request.form["order_id"]
 
             # mark order as fulfilled
             ret = db.mark_as_fulfilled(id)
@@ -662,5 +667,5 @@ def fulfill_order():
     return json.dumps({"result" : ERR_5})
                 
 
-#if __name__ == "__main__":
-#   app.run(debug=True, port="5002")
+if __name__ == "__main__":
+   app.run(host="0.0.0.0", debug=True, port="5004")

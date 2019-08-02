@@ -3,9 +3,28 @@
 
     <div>
         <div id="product">
-            <img src="{{ url_for('static', filename='images/loading.gif') }}" id="loading">
+            {% if products %}
+                <div class='list-group cart-group'>
+                {% if products|length > 0  %}
+                    {% for item in products %}
+                        <a href="item/{{ item['id'] }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <img src="static/images/{{ item['image_url'] }}" style="width:320px;height:250px;" />
+                            <div class="side-content">
+                                <div class="d-inline-flex p-3">
+                                <div class="p-2" style="width:700px;"><h4>{{ item['name'] }}</h4></div>
+                                <div class="p-2"><h4>${{ item['price'] }}</h4></div>
+                                </div>
+                                <p class="card-text">{{ item['description'] }}</p>
+                                <small>{{ item['tags'] }}</small>
+                            </div>
+                        </a>   
+                    {% endfor %}
+                {% else %}
+                    <h4>There are no items in stock!</h4>
+                {% endif %}
+                </div>
+            {% endif %}
         </div>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/load_products.js') }}"></script>
     </div>
 
 {% endblock %}

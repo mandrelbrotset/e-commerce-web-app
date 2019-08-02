@@ -21,11 +21,17 @@
             <br>
             <input type="submit" value="Login" class="btn btn-primary form-btn">
             <br><br>
-            {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endif %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <br><br>
+                    {% for message in messages %}
+                        <div class="alert alert-info" role="alert" id="message">
+                            {{ message }}
+                            <button onclick="hide_message()">x</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}        
     
         </form>
         <p>Don't have an account, <a href="/signup">sign up</a> instead</p>

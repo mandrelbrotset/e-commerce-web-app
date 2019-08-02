@@ -1,47 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
         
-    <style>
-        .dashboard {
-            width: 50%;
-            margin-top: 20px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        h2, h3 {
-            text-align: center;
-            padding-top: 15px;
-        }
-
-        /* ------- style for add-item  -------- */
-        #add-item {
-        width: 50%;
-        margin-top: 20px;
-        margin-left: auto;
-        margin-right: auto;
-        }
-
-        /* ------- style for edit-item  -------- */
-        #item-listing {
-            margin-top: 20px;
-        }
-
-        .add-item-btn {
-            width: 30%;
-            margin-left: 35%;
-            margin-right: 35%;
-        }
-
-        .upload-btn {
-            box-shadow: 0px;
-            -moz-window-shadow: 0px;
-        }
-        /* -------   -------- */
-
-    </style>
-
-
     <div class="dashboard">
         <button onclick="showAddItemPage()" class="btn">Add Item</button>
         <button onclick="showEditPage()" class="btn">Edit Item</button>
@@ -116,36 +75,36 @@
     <div id="edit-item">
         <h3>Edit Item</h3>
     
-        {% if data['products'] %}
+        {% if products %}
             <div class='list-group cart-group'>
-            {% if data['products']|length > 0  %}
-                {% for product in data['products'] %}
-                    <div class="list-group-item list-group-item-action flex-column align-items-start" id="{{ product['id'] }}">
-                        <img src="{{ url_for('static', filename="images/" + product['image_url']) }}" style="width:320px;height:250px;" />
+            {% if products|length > 0  %}
+                {% for item in products %}
+                    <div class="list-group-item list-group-item-action flex-column align-items-start" id="{{ item['id'] }}">
+                        <img src="{{ url_for('static', filename="images/" + item['image_url']) }}" style="width:320px;height:250px;" />
                         <p>
-                            Name: <input type="text" name="name" value="{{ product['name'] }}" id="name-{{ product['id'] }}"/>
+                            Name: <input type="text" name="name" value="{{ item['name'] }}" id="name-{{ item['id'] }}"/>
                         </p>
                         <p>
-                            Price: $<input type="price" step="0.01" name="price" value="{{ product['price'] }}" id="price-{{ product['id'] }}"/>
+                            Price: $<input type="price" step="0.01" name="price" value="{{ item['price'] }}" id="price-{{ item['id'] }}"/>
                         </p>
                         <p>
-                            Quantity: <input type="number" name="quantity" value="{{ product['quantity'] }}" id="quantity-{{ product['id'] }}"/>
+                            Quantity: <input type="number" name="quantity" value="{{ item['quantity'] }}" id="quantity-{{ item['id'] }}"/>
                         </p>
                         <p>
-                            Description: <input type="text" name="description" value="{{ product['description'] }}" id="description-{{ product['id'] }}"/>
+                            Description: <input type="text" name="description" value="{{ item['description'] }}" id="description-{{ item['id'] }}"/>
                         </p>
                         <p>
-                            Tags: <input type="text" name="tags" value="{{ product['tags'] }}" id="tags-{{ product['id'] }}"/>
+                            Tags: <input type="text" name="tags" value="{{ item['tags'] }}" id="tags-{{ item['id'] }}"/>
                         </p>
                         <p>
-                            Upload image: <input type="file" name="image" id="file-{{ product['id'] }}"/>
+                            Upload image: <input type="file" name="image" id="file-{{ item['id'] }}"/>
                         </p>
-                        <input type="hidden" name="image-name" value="{{ product['image_url'] }}" id="img-name-{{ product['id'] }}" />
+                        <input type="hidden" name="image-name" value="{{ item['image_url'] }}" id="img-name-{{ item['id'] }}" />
 
-                        <button name="button" onclick="saveItem('{{ product['id'] }}')" class="btn btn-primary">Save</button>
+                        <button name="button" onclick="saveItem('{{ item['id'] }}')" class="btn btn-primary">Save</button>
     
                         <form action="/delete_item" method="POST">
-                            <input type="hidden" name="item_id" value="{{ product['id'] }}" />
+                            <input type="hidden" name="item_id" value="{{ item['id'] }}" />
                             <button class="btn btn-danger btn-sm" type=submit>
                                 <span class="glyphicon glyphicon-trash"></span> Delete item
                             </button>
@@ -162,19 +121,19 @@
     <div id="item-listing">
         <h3>Items In Stock</h3>
         <div id="product">
-            {% if data['products'] %}
+            {% if products %}
                 <div class='list-group cart-group'>
-                {% if data['products']|length > 0  %}
-                    {% for product in data['products'] %}
-                        <a href="item/{{ product['id'] }}" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <img src="static/images/{{ product['image_url'] }}" style="width:320px;height:250px;" />
+                {% if products|length > 0  %}
+                    {% for item in products %}
+                        <a href="item/{{ item['id'] }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                            <img src="static/images/{{ item['image_url'] }}" style="width:320px;height:250px;" />
                             <div class="side-content">
                                 <div class="d-inline-flex p-3">
-                                <div class="p-2" style="width:700px;"><h4>{{ product['name'] }}</h4></div>
-                                <div class="p-2"><h4>${{ product['price'] }}</h4></div>
+                                <div class="p-2" style="width:700px;"><h4>{{ item['name'] }}</h4></div>
+                                <div class="p-2"><h4>${{ item['price'] }}</h4></div>
                                 </div>
-                                <p class="card-text">{{ product['description'] }}</p>
-                                <small>{{ product['tags'] }}</small>
+                                <p class="card-text">{{ item['description'] }}</p>
+                                <small>{{ item['tags'] }}</small>
                             </div>
                         </a>   
                     {% endfor %}

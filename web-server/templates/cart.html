@@ -2,22 +2,27 @@
 {% block content %}
 
     <div class="list-group cart-group">
-        {% if data['msg'] %}
-            <div class="alert alert-info" role="alert">
-                {{ data['msg'] }}
-
-                {% if 'logged_in' in session %}    
-                    {% if not session['logged_in'] %}
-                        , <a href="/sign_in">sign in</a>
-                    {% endif %}
-                {% endif %}
-            </div>
-        {% endif %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <br><br>
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert" id="message">
+                        {{ message }}
+                        {% if 'logged_in' in session %}    
+                            {% if not session['logged_in'] %}
+                                , <a href="/sign_in">sign in</a>
+                            {% endif %}
+                        {% endif %}
+                        <button onclick="hide_message()">x</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}        
 
         {% if data['cart'] %}
             <h2>Shopping Cart</h2>
 
-            {% for item in data['cart']%}
+            {% for item in cart %}
             <a href="{{ url_for('show_item', id=item['item_id']) }}"
                 class="list-group-item list-group-item-action flex-column align-items-start">
                 <img src="{{ url_for('static', filename='images/' + item['image_url']) }}" style="height:200px;" />
@@ -33,35 +38,6 @@
 
             <a href="/checkout" class="btn btn-primary checkout-btn">Checkout</a>
         {% endif %}
-        
-        <style>
-            .cart-group {
-                width: 80%;
-                margin: 20px auto;
-            }
-
-            .cart-group h2 {
-                text-align: center;
-                padding: 15px;
-            }
-
-            .cart-group img {
-                float: left;
-            }
-
-            .side-content {
-                float: left;
-                padding-left: 10px;
-                padding-top: 35px;
-            }
-
-            .checkout-btn {
-                margin: 10px 0 10px 90%;
-                width: 10%;
-            }
-        </style>
-        
     </div>
-
 
 {% endblock %}
