@@ -1,0 +1,201 @@
+li {
+    list-style-type: none;
+}
+
+.hello {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+/* ---- Style for home ----- */
+#loading {
+    display: block;
+    width: 300px;
+    margin-top: 90px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cart-group {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.cart-group img {
+    float: left;
+}
+.side-content {
+    float: left;
+    padding-left: 10px;
+    padding-top: 35px;
+}
+
+.side-content p {
+    padding-left: 25px;
+}
+
+.side-content small {
+    padding-left: 25px;
+}
+/* ----- End style for home ----- */
+
+/*  ---- Style for Login and Sign Up page  */
+.form {
+    width: 23.3%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.form h2 {
+    padding: 15px;
+    text-align: center;
+}
+
+.form p {
+    padding: 15px;
+    text-align: center;
+}
+
+.ig {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.form-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+input {
+    padding: 0px 4px;
+    border: 1px #d4d4d4 solid;
+}    
+/*  ----- End style for Login and Sign up page ----  */
+
+/*  ------------ item.html  -------------- */
+.content {
+    width: 95%;
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.view-item {
+    width: 100%;
+    padding: 5px;
+    display: inline-block;
+}
+
+.view-item img {
+    float: left;
+    width: 600px;
+}
+
+.view-item .side-content {
+    float: left;
+    margin: 100px 20px;
+    width: 600px;
+}
+
+.add-btn {
+    margin-top: 20px;
+}
+/*  ------------ item.html  -------------- */
+
+
+/* --------- dashboard.html --------- */
+.dashboard {
+    width: 50%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h2, h3 {
+    text-align: center;
+    padding-top: 15px;
+}
+
+/* ------- style for add-item  -------- */
+#add-item {
+width: 50%;
+margin-top: 20px;
+margin-left: auto;
+margin-right: auto;
+}
+
+/* ------- style for edit-item  -------- */
+#item-listing {
+    margin-top: 20px;
+}
+
+.add-item-btn {
+    width: 30%;
+    margin-left: 35%;
+    margin-right: 35%;
+}
+
+.upload-btn {
+    box-shadow: 0px;
+    -moz-window-shadow: 0px;
+}
+/* --------- dashboard.html --------- */
+
+
+/* --------- admin_account.html ----------- */
+.account-content {
+    width: 28%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.account-content h2 {
+    padding-top: 15px;
+    text-align: center;
+}
+
+.account-content h4 {
+    padding-top: 20px;
+    text-align: center;
+}
+
+.bio-container {
+    width: 100%;
+    float: left;
+    margin-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.name-email {
+    width: 32%;
+    float: left;
+}
+
+.name-value {
+    width: 68%;
+    float: left;
+}
+
+.chg-name-btn {
+    width: 40%;
+    margin-left: 30%;
+}
+
+.chg-name-btn {
+    width: 40%;
+    margin-left: 30%;
+}
+
+.chg-passwd-btn {
+    width: 50%;
+    margin-left: 25%;
+}
+
+.delete-btn {
+    margin-top: 60px;
+    width: 60%;
+    margin-left: 20%;
+}
+/* --------- admin_account.html ----------- */

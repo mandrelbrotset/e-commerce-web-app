@@ -1,0 +1,257 @@
+
+li {
+    list-style-type: none;
+}
+
+.hello {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+/* ---- Style for home ----- */
+#loading {
+    display: block;
+    width: 300px;
+    margin-top: 90px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cart-group {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.cart-group img {
+    float: left;
+}
+.side-content {
+    float: left;
+    padding-left: 10px;
+    padding-top: 35px;
+}
+
+.side-content p {
+    padding-left: 25px;
+}
+
+.side-content small {
+    padding-left: 25px;
+}
+/* ----- End style for home ----- */
+
+/*  ---- Style for Login and Sign Up page  */
+.form {
+    width: 23.3%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+.form h2 {
+    padding: 15px;
+    text-align: center;
+}
+
+.form p {
+    padding: 15px;
+    text-align: center;
+}
+
+.ig {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.form-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+input {
+    padding: 0px 4px;
+    border: 1px #d4d4d4 solid;
+}    
+/*  ----- End style for Login and Sign up page ----  */
+
+/*  -------- cart.html ------------- */
+
+.cart-group {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.cart-group h2 {
+    text-align: center;
+    padding: 15px;
+}
+
+.cart-group img {
+    float: left;
+}
+
+.side-content {
+    float: left;
+    padding-left: 10px;
+    padding-top: 35px;
+}
+
+.checkout-btn {
+    margin: 10px 0 10px 90%;
+    width: 10%;
+}
+/*  -------- cart.html ------------- */
+
+/* ------- Style for checkout page -------- */
+.checkout-ctn {
+    width: 80%;
+    margin: 20px auto;
+}
+
+.checkout-ctn h2 {
+        text-align: center;
+        padding: 15px;
+}
+
+.order-btn {
+        margin: 10px 0 10px 90%;
+        width: 10%;
+}
+
+.form-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.user-address {
+    width: 50%;
+    float: left;
+}
+
+.h5-header {
+    margin-top: 5px;
+}
+
+input {
+    padding: 0px 4px;
+    border: 1px #d4d4d4 solid;
+}
+
+.ig {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.cart-item {
+    height: 160px;
+    width: 48%;
+    float: left;
+    margin: 5px 0.5%;
+    background-color: #E3E3E6;
+    overflow: auto;
+    overflow-wrap: break-word;
+}
+
+.cart-item img {
+    float: left;
+    height: 160px;
+}
+
+.cart-item ul {
+    float: left;
+    margin: 15px 2px;
+}
+
+.cart-item li {
+    padding: 5px;
+}
+
+.total_cost {
+    width: 20%;
+    margin-left: 80%;
+}
+/* ------- End style for checkout page ------- */
+
+/* ------- Style for Item ------- */
+.content {
+    width: 95%;
+    margin-top: 40px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.view-item {
+    width: 100%;
+    padding: 5px;
+    display: inline-block;
+}
+
+.view-item img {
+    float: left;
+    width: 600px;
+}
+
+.view-item .side-content {
+    float: left;
+    margin: 100px 20px;
+    width: 600px;
+}
+
+.add-btn {
+    margin-top: 20px;
+}
+/* ------- End style for Item ------- */
+
+/* --------- My orders ----------- */
+h2, h3 {
+    text-align: center;
+    padding-top: 15px;
+}
+/* --------- My orders ----------- */
+
+/* ---- style for account  ---- */
+.account-content {
+    width: 28%;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.account-content h2 {
+    padding-top: 15px;
+    text-align: center;
+}
+
+.account-content h4 {
+    padding-top: 20px;
+    text-align: center;
+}
+
+.bio-container {
+    width: 100%;
+    float: left;
+    margin-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.name-email {
+    width: 32%;
+    float: left;
+}
+
+.name-value {
+    width: 68%;
+    float: left;
+}
+
+.chg-name-btn {
+    width: 40%;
+    margin-left: 30%;
+}
+
+.delete-btn {
+    margin-top: 60px;
+    width: 40%;
+    margin-left: 30%;
+}
+/* ---- style for account  ---- */
