@@ -39,7 +39,7 @@ def home():
     return render_template("home.html", products=products)
 
     
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/sign_up", methods=["GET", "POST"])
 def user_signup():
     if request.method == "POST":
         # get data from html form
@@ -85,7 +85,7 @@ def user_signup():
             if len(password) < 6:
                 flash("Password must meet length requirements")
             
-    return render_template("signup.html")
+    return render_template("sign_up.html")
 
 
 @app.route("/sign_in", methods=["GET", "POST"])
@@ -126,11 +126,11 @@ def sign_in():
         if session["logged_in"]:
             return redirect(url_for("home"))
 
-    return render_template("signin.html")
+    return render_template("sign_in.html")
 
 
-@app.route("/signout")
-def signout():
+@app.route("/sign_out")
+def sign_out():
     session.pop("logged_in", None)
     session.pop("email", None)
     session.pop("first_name", None)

@@ -2,37 +2,39 @@
 {% block content %}
  
     <div class="form">
-        <h2>Create admin account</h2>
+        <h2>Create account</h2>
         <form method="POST">
             <span class="input-title">First name</span>
             <input class="entry" type="text" name="first_name">
 
             <span class="input-title">Last name</span>
-            <input class="entry" class=""entry type="text" name="last_name">
+            <input class="entry" type="text" name="last_name">
 
             <span class="input-title">Email</span>
             <input class="entry" type="text" name="email">
 
             <span class="input-title">Password</span>
-            <small>Passwords must be at least 8 characters.</small>
-            <input class="entry" type="password" name="password" placeholder="At least 8 characters. ">
-            
+            <small>Passwords must be at least 6 characters.</small>
+            <input class="entry" type="password" name="password" placeholder="At least 6 characters. ">
             
             <br>
-            <input type="submit" value="Create admin account" class="btn btn-info form-btn">
+            <input type="submit" value="Sign up" class="btn btn-primary form-btn">
 
             <br><br>
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
+                    <br><br>
                     {% for message in messages %}
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger" role="alert" id="message">
                             {{ message }}
+                            <button onclick="hide_message()">x</button>
                         </div>
                     {% endfor %}
                 {% endif %}
-            {% endwith %}
-
+            {% endwith %}        
+    
         </form>
-        <p>Have an account, <a href="/">sign in</a> instead</p>
- 
+        <p>Have an account, <a href="/sign_in">sign in</a> instead</p>
+    </div>
+
 {% endblock %}

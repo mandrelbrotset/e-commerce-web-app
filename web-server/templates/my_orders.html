@@ -2,7 +2,7 @@
 {% block content %}
 
     <div id="my-orders">
-        <h3>Unulfilled Orders</h3>
+        <h3>Unfulfilled Orders</h3>
         {% if orders %}
             <div class='list-group cart-group'>
             {% if orders['unfulfilled_orders'] | length > 0 %}
@@ -38,7 +38,7 @@
             </div>
         {% endif %}
 
-        <h3>Fulfilled Orders</h3>
+        <h3>Delivered Items</h3>
         {% if orders %}
             <div class='list-group cart-group'>
             {% if orders['fulfilled_orders'] | length > 0 %}
@@ -71,7 +71,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <p>There are currently no orders to fulfill</p>
+                <p>No delivered items</p>
             {% endif %}
             </div>
         {% endif %}

@@ -25,51 +25,25 @@
         <h3>Add Item</h3>
     
         <form method="POST" enctype="multipart/form-data" action="/add_item">
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Item name</span>
-                </div>
-                <input type="text" name="name" style="width:658px;">
-            </div>
+            <span class="input-title">Item name</span>    
+            <input class="entry" type="text" name="name" >
+
+            <span class="input-title">Price $</span>
+            <input class="entry" type="text" name="price"step="0.01">
     
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Price $</span>
-                </div>
-                <input type="text" name="price" style="width:275px;" step="0.01">
+            <span class="input-title">Quantity</span>
+            <input class="entry" type="number" name="quantity">
+        
+            <span class="input-title">Description</span>
+            <input class="entry" type="text" name="description">
+            
+            <span class="input-title">Tags</span>
+            <input class="entry" type="text" name="tags" placeholder="Enter multiple tags separated by comma">
     
-                <div class="input-group-prepend" style="margin-left:52px;">
-                        <span class="input-group-text" id="">Quantity</span>
-                </div>
-                <input type="number" name="quantity" style="width:275px;">
-            </div>
+            <span class="input-title">Upload Image</span>
+            <input class="entry" type="file" name="image"/>
     
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Description</span>
-                </div>
-                <input type="text" name="description" style="width:654px;">
-            </div>
-    
-            <div class="input-group ig">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Tags</span>
-                </div>
-                <input type="text" name="tags" style="width:702px;" 
-                    placeholder="Enter multiple tags separated by comma">
-            </div>
-    
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="">Upload</span>
-                </div>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="inputGroupFile02" name="image" />
-                    <label class="custom-file-label" for="inputGroupFile02">Choose file</label>
-                </div>    
-            </div>
-    
-            <input type="submit" value="Add to stock" class="btn btn-primary add-item-btn">
+            <input type="submit" value="Add to stock" class="btn btn-info add-item-btn">
         </form>
     </div>
 
