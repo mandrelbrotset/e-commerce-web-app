@@ -122,7 +122,7 @@ h2, h3 {
     padding-top: 15px;
 }
 
-/* ------- style for add-item  -------- */
+/* -- style for add-item  -- */
 #add-item {
 width: 50%;
 margin-top: 20px;
@@ -130,7 +130,7 @@ margin-left: auto;
 margin-right: auto;
 }
 
-/* ------- style for edit-item  -------- */
+/* -- style for edit-item  -- */
 #item-listing {
     margin-top: 20px;
 }
@@ -145,7 +145,39 @@ margin-right: auto;
     box-shadow: 0px;
     -moz-window-shadow: 0px;
 }
-/* --------- dashboard.html --------- */
+
+.aside-left {
+    width: 20%;
+    float: left;
+}
+
+.aside-right {
+    margin-left: 21%;
+}
+
+.aside-left img {
+    max-width: 100%;
+    height: auto;
+}
+
+.input-title-1 {
+    padding-left: 0.5%;
+    text-align: left;
+    font-size: 19px;   
+}
+
+.entry-1 {
+    height: 35px;
+    padding: 3px;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.aside-right button {
+    width: 110px;
+    height: 35px;
+}
+/* ------------ dashboard.html ------------ */
 
 
 /* --------- admin_account.html ----------- */

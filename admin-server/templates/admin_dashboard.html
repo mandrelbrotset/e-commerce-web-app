@@ -55,35 +55,41 @@
             {% if products|length > 0  %}
                 {% for item in products %}
                     <div class="list-group-item list-group-item-action flex-column align-items-start" id="{{ item['id'] }}">
-                        <img src="{{ url_for('static', filename="images/" + item['image_url']) }}" style="width:320px;height:250px;" />
-                        <p>
-                            Name: <input type="text" name="name" value="{{ item['name'] }}" id="name-{{ item['id'] }}"/>
-                        </p>
-                        <p>
-                            Price: $<input type="price" step="0.01" name="price" value="{{ item['price'] }}" id="price-{{ item['id'] }}"/>
-                        </p>
-                        <p>
-                            Quantity: <input type="number" name="quantity" value="{{ item['quantity'] }}" id="quantity-{{ item['id'] }}"/>
-                        </p>
-                        <p>
-                            Description: <input type="text" name="description" value="{{ item['description'] }}" id="description-{{ item['id'] }}"/>
-                        </p>
-                        <p>
-                            Tags: <input type="text" name="tags" value="{{ item['tags'] }}" id="tags-{{ item['id'] }}"/>
-                        </p>
-                        <p>
-                            Upload image: <input type="file" name="image" id="file-{{ item['id'] }}"/>
-                        </p>
-                        <input type="hidden" name="image-name" value="{{ item['image_url'] }}" id="img-name-{{ item['id'] }}" />
+                        <div class="aside-left">
+                            <img src="{{ url_for('static', filename="images/" + item['image_url']) }}" />
+                        </div>
 
-                        <button name="button" onclick="saveItem('{{ item['id'] }}')" class="btn btn-primary">Save</button>
-    
-                        <form action="/delete_item" method="POST">
-                            <input type="hidden" name="item_id" value="{{ item['id'] }}" />
-                            <button class="btn btn-danger btn-sm" type=submit>
-                                <span class="glyphicon glyphicon-trash"></span> Delete item
-                            </button>
-                        </form>
+                        <div class="aside-right">
+                            <span class="input-title-1">Name</span>
+                            <input class="entry-1" type="text" name="name" value="{{ item['name'] }}" id="name-{{ item['id'] }}" style="width:65%;"/>
+                            
+                            <span class="input-title-1">Quantity</span>
+                            <input class="entry-1" type="number" name="quantity" value="{{ item['quantity'] }}" id="quantity-{{ item['id'] }}" style="width:21%;"/>
+
+                            <span class="input-title-1">Description</span>
+                            <input class="entry-1" type="text" name="description" value="{{ item['description'] }}" id="description-{{ item['id'] }}" style="width:68%;"/>
+
+                            <span class="input-title-1">Price</span>
+                            <input class="entry-1" type="price" step="0.01" name="price" value="{{ item['price'] }}" id="price-{{ item['id'] }}"  style="width:16%;"/>
+                            
+                            <span class="input-title-1">Tags</span>
+                            <input class="entry-1" type="text" name="tags" value="{{ item['tags'] }}" id="tags-{{ item['id'] }}" style="width:62%;"/>
+                            
+                            <span class="input-title-1">Upload image</span>
+                            <input type="file" name="image" id="file-{{ item['id'] }}" style="height:38px;width:21%;"/>
+                            
+                            <input type="hidden" name="image-name" value="{{ item['image_url'] }}" id="img-name-{{ item['id'] }}" />
+
+                            <div style="margin-top:10px;margin-left: 35%;">
+                                <form action="/delete_item" method="POST">
+                                    <input type="hidden" name="item_id" value="{{ item['id'] }}" />
+                                    <button name="button" onclick="saveItem('{{ item['id'] }}')" class="btn btn-primary">Save</button>
+                                    <button class="btn btn-danger btn-sm" type=submit>
+                                        <span class="glyphicon glyphicon-trash"></span> Delete item
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
