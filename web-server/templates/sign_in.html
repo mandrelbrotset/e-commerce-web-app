@@ -10,9 +10,6 @@
             <span class="input-title">Password</span>
             <input class="entry" type="password" name="password">
             
-            <br>
-            <input type="submit" value="Login" class="btn btn-primary form-btn">
-            <br><br>
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <br><br>
@@ -25,6 +22,9 @@
                 {% endif %}
             {% endwith %}        
     
+            <br>
+            <input type="submit" value="Login" class="btn btn-primary form-btn">
+            <br><br>
         </form>
         <p>Don't have an account, <a href="/sign_up">sign up</a> instead</p>
     </div>

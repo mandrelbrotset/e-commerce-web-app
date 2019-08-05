@@ -38,28 +38,35 @@
     
                     <input type="hidden" name="email" value="{{ session['email'] }}">
     
+                    <span class="input-title">Current password</span>
+                    <input class="entry" type="password" name="old-password">
+
                     <span class="input-title">New password</span>
-                    <input class="entry" type="password" name="password">
+                    <small>Passwords must be at least 8 characters.</small>
+                    <input class="entry" type="password" name="new-password">
+
+                    <span class="input-title">Confirm new password</span>
+                    <input class="entry" type="password" name="confirm-password">
                         
                     <input type="submit" value="Change admin password" class="btn btn-info chg-passwd-btn">
                 </form>
     
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <br><br>
+                        {% for message in messages %}
+                            <div class="alert alert-info" role="alert" id="flash-message">
+                                {{ message }}
+                                <button onclick="hide_message()">x</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}        
+                
                 <a href="/delete_admin_account" class="btn btn-danger delete-btn">Delete admin account</a>
             {% endif %}
         {% endif %}
     
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <br><br>
-                {% for message in messages %}
-                    <div class="alert alert-info" role="alert" id="flash-message">
-                        {{ message }}
-                        <button onclick="hide_message()">x</button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}        
-
     </div>
 
 {% endblock %}

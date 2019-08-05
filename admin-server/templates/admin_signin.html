@@ -11,10 +11,7 @@
             <span class="input-title">Password</span>
             <input class="entry" type="password" name="password">
             
-            <br><br>
-            <input type="submit" value="Login as admin" class="btn btn-info form-btn">
-            <br><br>
-
+            <br>
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for message in messages %}
@@ -24,6 +21,10 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+            <br><br>
+
+            <input type="submit" value="Login as admin" class="btn btn-info form-btn">
+            <br><br>
 
         </form>
         <p>Don't have an account, <a href="/admin_signup">create an admin</a> account</p>

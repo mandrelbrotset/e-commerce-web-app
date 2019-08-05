@@ -388,24 +388,46 @@ def change_admin_name():
 
 @app.route("/change_admin_password", methods=["POST"])
 def change_admin_password():
-    data = {"msg" : None}
-
     if request.method == "POST":
-        email = session["email"]
-        password = request.form["password"]
+        old_password = request.form["old-password"]
+        new_password = request.form["new-password"]
+        confirm_password = request.form["confirm-password"]
 
-        params = {"email" : email,
-                  "password" : password,
+        # Check if old password is correct
+        # Rest API endpoint
+        endpoint = API_ENDPOINT + "admin_signin"
+
+        params = {"email" : session["email"],
+                  "password" : old_password,
                   "key" : API_KEY}
-
-        endpoint = API_ENDPOINT + "change_admin_password"
+        # make a POST request to the Rest API
         response = re.post(url=endpoint, data=params)
-        response = response.json()
+        # convert result from JSON to python dictionary
+        response = json.loads(response.text)
 
+        # If old password is correct
         if response["result"] == "success":
-            data["msg"] = "Changed password successfully!"
+            if len(new_password) >= 8 and len(confirm_password) >= 8:
+                # Confirm the new password
+                if new_password == confirm_password:
+                    params = {"email" : session["email"],
+                            "password" : new_password,
+                            "key" : API_KEY}
+
+                    endpoint = API_ENDPOINT + "change_admin_password"
+                    response = re.post(url=endpoint, data=params)
+                    response = response.json()
+                
+                    if response["result"] == "success":
+                        flash("Changed password successfully!")
+                    else:
+                        flash("Error changing password.")
+                else:
+                    flash("Password must meet length complexity")
+            else:
+                flash("Passwords are not the same")
         else:
-            data["msg"] = "Error changing password."
+            flash("Password is incorrect")
 
         return redirect(url_for("admin_account"))
 

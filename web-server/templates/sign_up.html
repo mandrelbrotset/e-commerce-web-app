@@ -17,10 +17,6 @@
             <small>Passwords must be at least 6 characters.</small>
             <input class="entry" type="password" name="password" placeholder="At least 6 characters. ">
             
-            <br>
-            <input type="submit" value="Sign up" class="btn btn-primary form-btn">
-
-            <br><br>
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <br><br>
@@ -33,6 +29,9 @@
                 {% endif %}
             {% endwith %}        
     
+            <br>
+            <input type="submit" value="Sign up" class="btn btn-primary form-btn">
+            <br><br>
         </form>
         <p>Have an account, <a href="/sign_in">sign in</a> instead</p>
     </div>

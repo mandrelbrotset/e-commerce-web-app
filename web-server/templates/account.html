@@ -38,27 +38,36 @@
     
                     <input type="hidden" name="email" value="{{ session['email'] }}">
     
+                    <span class="input-title">Current password</span>
+                    <input class="entry" type="password" name="old-password">
+
                     <span class="input-title">New password</span>
-                    <input class="entry" type="password" name="password">
+                    <small>Passwords must be at least 6 characters.</small>
+                    <input class="entry" type="password" name="new-password">
+
+                    <span class="input-title">Confirm new password</span>
+                    <input class="entry" type="password" name="confirm-password">
                         
                     <input type="submit" value="Change password" class="btn btn-primary chg-name-btn">
                 </form>
     
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <br><br>
+                        {% for message in messages %}
+                            <div class="alert alert-info" role="alert" id="flash-message">
+                                {{ message }}
+                                <button onclick="hide_message()">x</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}        
+
                 <a href="/delete_account" class="btn btn-danger delete-btn">Delete account</a>
             {% endif %}
         {% endif %}
     
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <br><br>
-                {% for message in messages %}
-                    <div class="alert alert-info" role="alert" id="flash-message">
-                        {{ message }}
-                        <button onclick="hide_message()">x</button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}        
+        
                 
     </div>
 

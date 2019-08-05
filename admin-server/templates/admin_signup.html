@@ -16,10 +16,6 @@
             <span class="input-title">Password</span>
             <small>Passwords must be at least 8 characters.</small>
             <input class="entry" type="password" name="password" placeholder="At least 8 characters. ">
-            
-            
-            <br>
-            <input type="submit" value="Create admin account" class="btn btn-info form-btn">
 
             <br><br>
             {% with messages = get_flashed_messages() %}
@@ -31,6 +27,9 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
+
+            <br>
+            <input type="submit" value="Create admin account" class="btn btn-info form-btn">
 
         </form>
         <p>Have an account, <a href="/">sign in</a> instead</p>
