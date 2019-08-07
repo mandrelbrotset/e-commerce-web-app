@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  web-server:
+    build: .
+    environment:
+      - REST_API=microservices_rest-api_1
+    ports:
+      - '80:80'

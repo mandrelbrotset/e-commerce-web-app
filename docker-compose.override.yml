@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  mysql:
+    networks:
+      - back-tier
+
+  rest-api:
+    depends_on:
+      - 'mysql'
+    networks:
+      - back-tier
+      - front-tier
+
+  admin-server:
+    depends_on:
+      - 'rest-api'
+    networks:
+      - front-tier
+
+  web-server:
+    networks:
+      - front-tier
+
+networks:
+  back-tier:
+  front-tier:
+  
