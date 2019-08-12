@@ -10,7 +10,7 @@ COPY flask_settings flask_settings
 
 # install and configure nginx as proxy server
 RUN apt-get update \
-    && apt-get install nginx curl -y \
+    && apt-get install nginx curl iputils-ping -y \
     && rm /etc/nginx/sites-enabled/default \
     && cp flask_settings /etc/nginx/sites-enabled/flask_settings \
     && cp flask_settings /etc/nginx/sites-available/flask_settings

@@ -47,6 +47,11 @@ def generate_hash(password):
     return salt, hash
 
 
+@app.route("/")
+def health_check():
+    return "<html><h1>Healthy!</h1></html>"
+
+
 @app.route("/signup", methods=["POST"])
 def user_signup():
     if request.method == "POST":
@@ -668,4 +673,4 @@ def fulfill_order():
                 
 
 if __name__ == "__main__":
-   app.run(host="0.0.0.0", debug=True, port="5004")
+   app.run(host="0.0.0.0")

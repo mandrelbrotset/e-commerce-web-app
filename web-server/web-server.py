@@ -24,6 +24,12 @@ if __name__ != "__main__":
     except:
         pass
 
+
+@app.route("/health")
+def health():
+    return "<html><h1>Healthy!</h1></html>"
+    
+
 @app.route("/")
 def home():
     # get items currently in stock
@@ -441,4 +447,4 @@ def my_orders():
         return render_template("my_orders.html", orders=orders)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True, port=5000)
+    app.run(host="0.0.0.0")

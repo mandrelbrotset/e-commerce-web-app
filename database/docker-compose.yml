@@ -1,7 +1,0 @@
-version: '3'
-
-services:
-  mysql:
-    build: .
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=1

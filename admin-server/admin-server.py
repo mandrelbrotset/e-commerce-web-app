@@ -17,6 +17,11 @@ app.secret_key = "2cpdgildcbdspdbqyee10svy6nmom0reiyzujsn048ri7nsaej"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
+@app.route("/health")
+def health():
+    return "<html><h1>Healthy!</h1></html>"
+
+
 @app.route("/admin_signup", methods=["GET", "POST"])
 def admin_signup():
     if request.method == "POST":
@@ -449,4 +454,4 @@ def allowed_file(filename):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True, port=5002)
+    app.run(host="0.0.0.0")
