@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  rest-api:
+    build: .
+    image: rest-api:latest
+    ports:
+      - "80:80"
+    environment:
+      - DB_HOST=
+      - DB_USERNAME=rest-api
+      - DB_PASSWORD=password
+      - DB_NAME=microservice
+      - DB_PORT=3306
+      - API_KEY=123456789
