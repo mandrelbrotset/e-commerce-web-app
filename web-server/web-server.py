@@ -10,11 +10,11 @@ import config
 # Rest API endpoint
 API_ENDPOINT = config.REST_API
 API_KEY = config.API_KEY
-UPLOAD_FOLDER = "static/images"
+MEDIA_BUCKET = config.MEDIA_BUCKET
 
 # flask config
 app = Flask(__name__, static_folder="static")
-app.secret_key = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
+app.secret_key = config.SECRET_KEY
 
 if __name__ != "__main__":
     try:
@@ -42,7 +42,7 @@ def home():
     if response["result"] == "success":
         products = response["items"]
     
-    return render_template("home.html", products=products)
+    return render_template("home.html", products=products, media_bucket=MEDIA_BUCKET)
 
     
 @app.route("/sign_up", methods=["GET", "POST"])
@@ -182,7 +182,7 @@ def show_item(id):
 
     if response["result"] == "success":
         item = response["item"]
-        return render_template("item.html", item=item)
+        return render_template("item.html", item=item, media_bucket=MEDIA_BUCKET)
 
     # implement error page
     return "<html>Item not found</html>"
@@ -212,7 +212,7 @@ def cart():
     else:
         flash("Sign in to see your cart")
 
-    return render_template("cart.html", cart=cart)
+    return render_template("cart.html", cart=cart, media_bucket=MEDIA_BUCKET)
 
 
 @app.route("/account")
@@ -417,7 +417,7 @@ def checkout():
             elif response["result"] == "empty":
                 flash("Your cart is empty")
 
-        return render_template("checkout.html", data=data)
+        return render_template("checkout.html", data=data, media_bucket=MEDIA_BUCKET)
 
     # if user is not signed in
     return redirect(url_for("sign_in"))

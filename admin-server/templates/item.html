@@ -6,7 +6,7 @@
         <div class="content">
             <div class="card view-item">
                 <div src="img-wrapper">
-                    <img src="{{ url_for('static', filename='images/' + data['item'][6]) }}" alt="Item image">
+                    <img src="{{ media_bucket }}/{{ data['item'][6]) }}" alt="Item image">
                 </div>
                 <div class="side-content">
                     <h4 class="card-title">{{ data['item'][1] }} ${{ data['item'][5] }}</h4>

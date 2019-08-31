@@ -1,3 +1,5 @@
-API_KEY = "193420702d05eb046e6690b2b4a0fc53ec6a52dee3853e568ea55d09526922cf"
+SECRET_KEY = "0reiyzujsn048ri7nsaej2cpdgildcbdspdbqyee10svy6nmom"
 
-
+REST_API = ""
+API_KEY = ""
+MEDIA_BUCKET = ""

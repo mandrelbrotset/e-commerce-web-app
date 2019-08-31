@@ -5,16 +5,18 @@ from werkzeug.utils import secure_filename
 import json
 import config
 import os
+import random
+import datetime
+import boto3
 
 API_ENDPOINT = config.REST_API
 API_KEY = config.API_KEY
-UPLOAD_FOLDER = "item_pictures"
+MEDIA_BUCKET = config.MEDIA_BUCKET
 ALLOWED_EXTENSIONS = set(["png", "jpg", "jpeg", "gif", "bmp", "tif", "svg"])
 
 # flask config
 app = Flask(__name__, static_folder="static")
-app.secret_key = "2cpdgildcbdspdbqyee10svy6nmom0reiyzujsn048ri7nsaej"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.secret_key = config.SECRET_KEY
 
 
 @app.route("/health")
@@ -141,7 +143,7 @@ def admin_dashboard():
             else:
                 flash("An error ocurred while retrieving ordered item")
 
-            return render_template("admin_dashboard.html", products=products, orders=orders)
+            return render_template("admin_dashboard.html", products=products, orders=orders, media_bucket=MEDIA_BUCKET)
     else:
         return redirect(url_for("admin_signin"))
 
@@ -159,7 +161,7 @@ def show_item(id):
 
     if response["result"] == "success":
         data["item"] = response["item"]
-        return render_template("item.html", data=data)
+        return render_template("item.html", data=data, media_bucket=MEDIA_BUCKET)
 
     # implement error page
     return "<html>Item not found</html>"
@@ -441,10 +443,20 @@ def change_admin_password():
 def save_image(request_files, file_name):
     if file_name in request_files and request_files[file_name].filename != "" \
     and allowed_file(request_files[file_name].filename):
-        new_filename = secure_filename(request_files[file_name].filename)
-        image_url = os.path.join(app.config["UPLOAD_FOLDER"], new_filename)
-        request_files[file_name].save(image_url)
-        return new_filename
+        # generate new image name
+        dt = datetime.datetime.now()
+        image_name = dt.strftime("%m%d%Y_%H%M_%f_%j_") + str(random.randint(1, 100000))
+
+        # Connect to Amazon S3
+        s3 = boto3.client('s3')
+
+        # Read the contents of the file
+        content = request_files[file_name].read()
+
+        # Use Boto to upload the file to the S3 bucket
+        s3.put_object(ACL='public-read', Body=content, Bucket=MEDIA_BUCKET, Key=image_name)
+
+        return image_name
     else:
         return None
 

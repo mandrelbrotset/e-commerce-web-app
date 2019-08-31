@@ -8,7 +8,7 @@
                 {% if products|length > 0  %}
                     {% for item in products %}
                         <a href="item/{{ item['id'] }}" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <img src="static/images/{{ item['image_url'] }}" style="width:320px;height:250px;" />
+                            <img src="{{ media_bucket }}/{{ item['image_url'] }}" style="width:320px;height:250px;" />
                             <div class="side-content">
                                 <div class="d-inline-flex p-3">
                                 <div class="p-2" style="width:700px;"><h4>{{ item['name'] }}</h4></div>

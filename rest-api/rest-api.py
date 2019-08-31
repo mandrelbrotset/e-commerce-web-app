@@ -47,7 +47,7 @@ def generate_hash(password):
     return salt, hash
 
 
-@app.route("/")
+@app.route("/health")
 def health_check():
     return "<html><h1>Healthy!</h1></html>"
 
