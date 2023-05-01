@@ -1,4 +1,4 @@
-Flask==1.0.3
+Flask==2.3.2
 Flask-Hashing==1.1
 PyMySQL==0.9.3
 requests==2.21.0
